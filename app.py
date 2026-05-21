@@ -33,7 +33,9 @@ if api_key:
 
     genai.configure(api_key=api_key)
 
-    model = genai.GenerativeModel("models/gemini-1.5-flash")
+    st.write("Gemini Connected Successfully")
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
     st.subheader("Teacher Input Section")
 
@@ -93,7 +95,9 @@ if api_key:
             Use professional school language suitable for CBSE schools.
             """
 
-            response = model.generate_content(prompt)
+          response = model.generate_content(
+    contents=prompt
+)
 
             lesson_text = response.text
 
