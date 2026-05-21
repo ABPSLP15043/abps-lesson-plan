@@ -35,7 +35,7 @@ if api_key:
 
     st.write("Gemini Connected Successfully")
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash")
 
     st.subheader("Teacher Input Section")
 
