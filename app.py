@@ -55,7 +55,6 @@ if api_key:
         "Paste Rough Notes / Teaching Ideas",
         height=200
     )
-
     if st.button("Generate ABPS Lesson Plan"):
 
         with st.spinner("Generating Lesson Plan..."):
@@ -91,53 +90,55 @@ if api_key:
             13. Remedial Measures
             14. Values Inculcated
             15. Suggested Resources
-
-            Use professional school language suitable for CBSE schools.
             """
 
-          response = model.generate_content(
-    contents=prompt
-)
+            try:
 
-            lesson_text = response.text
+                response = model.generate_content(
+                    contents=prompt
+                )
 
-            st.success("Lesson Plan Generated Successfully")
+                lesson_text = response.text
 
-            st.markdown(lesson_text)
+                st.success("Lesson Plan Generated Successfully")
 
-            # CREATE WORD DOCUMENT
-            doc = Document()
+                st.markdown(lesson_text)
 
-            doc.add_heading(
-                "The Aditya Birla Public School, Baikunth",
-                level=1
-            )
+                doc = Document()
 
-            doc.add_heading(
-                "NCF 2023 Integrated Lesson Plan",
-                level=2
-            )
+                doc.add_heading(
+                    "The Aditya Birla Public School, Baikunth",
+                    level=1
+                )
 
-            doc.add_paragraph(f"Teacher Name: {teacher_name}")
-            doc.add_paragraph(f"Subject: {subject}")
-            doc.add_paragraph(f"Class: {grade}")
-            doc.add_paragraph(f"Chapter: {chapter}")
-            doc.add_paragraph(f"Month: {month}")
-            doc.add_paragraph(f"No. of Periods: {periods}")
+                doc.add_heading(
+                    "NCF 2023 Integrated Lesson Plan",
+                    level=2
+                )
 
-            doc.add_paragraph(lesson_text)
+                doc.add_paragraph(f"Teacher Name: {teacher_name}")
+                doc.add_paragraph(f"Subject: {subject}")
+                doc.add_paragraph(f"Class: {grade}")
+                doc.add_paragraph(f"Chapter: {chapter}")
+                doc.add_paragraph(f"Month: {month}")
+                doc.add_paragraph(f"No. of Periods: {periods}")
 
-            buffer = BytesIO()
+                doc.add_paragraph(lesson_text)
 
-            doc.save(buffer)
+                buffer = BytesIO()
 
-            st.download_button(
-                label="📥 Download Lesson Plan DOCX",
-                data=buffer.getvalue(),
-                file_name=f"{chapter}_Lesson_Plan.docx",
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            )
+                doc.save(buffer)
 
-else:
+                st.download_button(
+                    label="📥 Download Lesson Plan DOCX",
+                    data=buffer.getvalue(),
+                    file_name=f"{chapter}_Lesson_Plan.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
+
+            except Exception as e:
+
+                st.error(f"Gemini Error: {e}")
+
 
     st.info("Please Enter Gemini API Key in Sidebar")
