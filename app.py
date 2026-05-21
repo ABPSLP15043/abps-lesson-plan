@@ -13,7 +13,7 @@ st.markdown("""
 """, unsafe_allowed_html=True)
 
 st.markdown('<div class="main-title">The Aditya Birla Public School, Baikunth</div>', unsafe_allowed_html=True)
-st.markdown('<div class="subtitle">AI-Powered NCF Curricular Goal & Lesson Plan Builder</div>', unsafe_allowed_html=True)
+st.markdown('<div class="subtitle">AI-Powered NCF Curricular Goal & Lesson Plan Builder</div>', unsafe_allow_html=True)
 
 # Sidebar for Key Configuration
 st.sidebar.header("Configuration")
