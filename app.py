@@ -18,92 +18,216 @@ from reportlab.lib import colors
 st.set_page_config(page_title="ABPS Baikunth - Lesson Plan Generator", layout="wide")
 
 st.title("🏫 The Aditya Birla Public School, Baikunth")
-st.caption("Integrated NCF-SE 2023 | NEP 2020 Lesson Plan Generator (PDF & Word)")
+st.caption("Integrated NCF-SE 2023 | NEP 2020 Lesson Plan Generator (English, Hindi & Sanskrit)")
 
 # ---------------------------------------------------------
-# COMPREHENSIVE CONTENT BUILDER ENGINE
+# LANGUAGE CONTENT GENERATION ENGINE
 # ---------------------------------------------------------
 def build_comprehensive_plan(subject, grade, section, chapter, month, periods):
-    return {
-        "curriculum_goal": f"CG-3: Explores {subject} by understanding foundational concepts, processes, and interactions, while promoting responsible and analytical practices.",
-        "relevant_competencies": [
-            f"C-3.1: Explains core principles of {chapter} through observation and scientific understanding.",
-            "C-3.2: Relates theoretical concepts to real-world phenomena and practical applications.",
-            "C-3.3: Demonstrates responsible behavior, informed decision-making, and analytical practices based on knowledge."
-        ],
-        "learning_objectives": [
-            f"Explain the primary concepts and mechanisms of {chapter}.",
-            "Identify key terms, definitions, and underlying scientific/academic principles.",
-            "Understand practical applications in daily life and industrial contexts.",
-            "Relate theoretical models with environmental and real-world interactions.",
-            "Appreciate sustainable practices and problem-solving methodologies."
-        ],
-        "expected_learning_outcomes": [
-            f"Explain key definitions and core mechanisms of {chapter} with examples.",
-            "Demonstrate understanding using practical experiments or case studies.",
-            "Differentiate between primary concepts, classifications, and components.",
-            "Describe natural cycles, applications, or functional structures related to the topic.",
-            "Apply acquired concepts in daily life and academic assessments."
-        ],
-        "teaching_methodology": [
-            "Inquiry Based Learning", "Activity Based Learning", "Demonstration Method",
-            "Cooperative Learning", "Think-Pair-Share", "Experiential Learning",
-            "Competency Based Learning", "Discussion Method", "Observation Method"
-        ],
-        "teaching_aids": [
-            "Smart Board / Interactive PPT", "NCERT Animations & Videos",
-            "Worksheets & Handouts", "Demonstration Equipment & Charts"
-        ],
-        "art_integration": [
-            f"{chapter} Mind Map / Flow Chart", "Concept Posters & Infographics",
-            "Illustrative Diagrams & Comic Strips"
-        ],
-        "previous_knowledge": [
-            f"Why does this phenomenon occur in daily life related to {subject}?",
-            f"Where do we observe the practical applications of {chapter} around us?",
-            "How do environmental conditions affect these processes?"
-        ],
-        "innovative_techniques": [
-            "Blended Learning", "QR Code Videos", "Interactive PPT", "Mind Mapping",
-            "Virtual Laboratory", "Quizizz / Kahoot", "Exit Tickets"
-        ],
-        "content_points": [
-            {"section": "Introduction & Fundamentals", "topics": [f"Basic definitions and importance of {chapter}", "Everyday life examples and historical context"]},
-            {"section": "Core Concept Analysis", "topics": ["Detailed theoretical framework", "Mechanisms, formulas, and structural breakdown"]},
-            {"section": "Practical Applications & Phenomena", "topics": ["Real-world applications and observational studies", "Environmental and industrial relevance"]},
-            {"section": "Review & Synthesis", "topics": ["Concept mapping and summary worksheets", "Interactive revision and quiz sessions"]}
-        ],
-        "projects_experiential": [
-            f"Demonstrate core principles of {chapter} using simple materials.",
-            f"Construct a working model or visual poster detailing {chapter}.",
-            "Prepare a case study report on practical applications in your locality."
-        ],
-        "skills_acquired": [
-            "Observation", "Scientific Inquiry", "Critical Thinking",
-            "Classification", "Experimentation", "Data Analysis", "Teamwork"
-        ],
-        "values_inculcated": [
-            "Environmental Awareness", "Scientific Temper", "Curiosity",
-            "Teamwork", "Responsibility", "Sustainable Living"
-        ],
-        "multiple_assessment": {
-            "oral_questions": [f"What is the core principle of {chapter}?", "Give two real-life examples."],
-            "worksheet": ["MCQs", "Assertion–Reason", "Match the Following", "Case Study Questions"],
-            "practical": ["Experiment Performance", "Observation Skills", "Scientific Reasoning"],
-            "exit_ticket": ["Write one new concept learned today and one real-life application."]
-        },
-        "class_work": ["Concept Notes & Diagrams", "Observation Tables", "Mind Maps & Flowcharts", "Solving NCERT Worksheet Questions"],
-        "home_work": [f"Prepare a detailed concept map of {chapter}.", "Answer review questions from the textbook.", "List 5 daily life examples of the topic."],
-        "remedial_measures": {
-            "slow_learners": ["Picture cards and visual aids", "Peer tutoring & guided study", "Simplified worksheets and oral questioning"],
-            "advanced_learners": ["Research assignments on advanced applications", "Preparation of presentations / solar models", "In-depth case study analysis"]
-        },
-        "resources": {
-            "books": [f"NCERT {grade} {subject} Textbook", "CBSE Lab Manual & Exemplar"],
-            "websites": ["DIKSHA Portal", "NCERT e-Resources", "CBSE Academic", "National Digital Library of India"],
-            "videos": ["NCERT Official Videos", "DIKSHA Learning Modules", "Khan Academy"]
+    if subject == "HINDI":
+        return {
+            "curriculum_goal": f"लक्ष्य-3: {subject} शिक्षण द्वारा भाषा-कौशल, मौलिक चिंतन, रचनात्मकता एवं साहित्यिक समझ का विकास करना।",
+            "relevant_competencies": [
+                f"दक्षता-3.1: '{chapter}' पाठ का स्पष्ट उच्चारण, पठन एवं भावग्रहण करना।",
+                "दक्षता-3.2: व्याकरणिक नियमों एवं भाषिक संरचनाओं का सही प्रयोग करना।",
+                "दक्षता-3.3: व्यावहारिक जीवन एवं लेखन में नए शब्दों और विचारों का अनुप्रयोग करना।"
+            ],
+            "learning_objectives": [
+                f"पाठ '{chapter}' के मुख्य भाव, विचार एवं केंद्रीय विषय को समझना।",
+                "कठिन शब्दों के अर्थ एवं व्याकरणिक तत्वों का ज्ञान प्राप्त करना।",
+                "शुद्ध उच्चारण, वाचन एवं अभिव्यक्ति क्षमता को बढ़ाना।",
+                "साहित्यिक विधाओं एवं लेखक/कवि के दृष्टिकोण को समझना।"
+            ],
+            "expected_learning_outcomes": [
+                f"विद्यार्थी '{chapter}' के प्रश्नों के उत्तर स्पष्ट रूप से देने में सक्षम होंगे।",
+                "नए शब्दावली का वाक्यों में प्रयोग कर सकेंगे।",
+                "पाठ के नैतिक एवं व्यावहारिक संदेश को जीवन में अपना सकेंगे।"
+            ],
+            "teaching_methodology": [
+                "वाचन विधि (Reading Method)", "व्याख्यान विधि (Lecture Method)", 
+                "प्रश्न उत्तर विधि (Q&A Method)", "सामूहिक चर्चा (Group Discussion)"
+            ],
+            "teaching_aids": [
+                "स्मार्ट बोर्ड / वीडियो", "चित्र एवं फ्लैश कार्ड", "पाठ्यपुस्तक एवं कार्यपत्रिका"
+            ],
+            "art_integration": [
+                f"'{chapter}' पर आधारित माइंड मैप या पोस्टर निर्माण", "नाट्य रूपांतरण / संवाद वाचन"
+            ],
+            "previous_knowledge": [
+                f"क्या विद्यार्थियों ने दैनिक जीवन में '{chapter}' से संबंधित विषय का अनुभव किया है?",
+                "पाठ से संबंधित बुनियादी शब्दावली की समझ की जाँच।"
+            ],
+            "innovative_techniques": [
+                "माइंड मैपिंग (Mind Mapping)", "डिजिटल वाचन", "क्विज़ (Quizizz / Kahoot)"
+            ],
+            "content_points": [
+                {"section": "भूमिका एवं परिचय", "topics": [f"लेखक/कवि का परिचय एवं '{chapter}' का मुख्य सार"]},
+                {"section": "व्याख्या एवं भावार्थ", "topics": ["पाठ का वाचन, कठिन शब्दार्थ एवं व्याख्या"]},
+                {"section": "व्याकरण एवं प्रयोग", "topics": ["संबद्ध व्याकरणिक तत्व (पर्यायवाची, विलोम, समास आदि)"]}
+            ],
+            "projects_experiential": [
+                f"'{chapter}' के विषय पर एक लघु अनुच्छेद या स्वरचित कविता/कहानी लिखें।"
+            ],
+            "skills_acquired": [
+                "श्रवण (Listening)", "वाचन (Speaking)", "पठन (Reading)", "लेखन (Writing)"
+            ],
+            "values_inculcated": [
+                "नैतिक मूल्य", "सांस्कृतिक चेतना", "संवेदनशीलता", "पर्यावरण संरक्षण"
+            ],
+            "multiple_assessment": {
+                "oral_questions": [f"'{chapter}' का मुख्य संदेश क्या है?", "पाठ से आपने क्या सीखा?"],
+                "worksheet": ["बहुविकल्पीय प्रश्न (MCQs)", "शब्दार्थ एवं वाक्य प्रयोग", "लघु उत्तरीय प्रश्न"],
+                "practical": ["सस्वर वाचन एवं उच्चारण सुधार"],
+                "exit_ticket": ["आज आपने जो नया शब्द सीखा, उससे एक वाक्य बनाएं।"]
+            },
+            "class_work": ["पाठ्यपुस्तक के प्रश्नोत्तर लिखना", "शब्दार्थ एवं अभ्यास कार्य"],
+            "home_work": [f"'{chapter}' का सारांश अपने शब्दों में लिखें।", "कठिन शब्दों के अर्थ याद करें।"],
+            "remedial_measures": {
+                "slow_learners": ["सस्वर वाचन अभ्यास", "चित्रों के माध्यम से समझाना", "सरल अभ्यास पत्र"],
+                "advanced_learners": ["मौलिक रचनात्मक लेखन", "पूरक साहित्य पढ़ने हेतु प्रेरित करना"]
+            },
+            "resources": {
+                "books": [f"एनसीईआरटी (NCERT) कक्षा {grade} हिंदी पाठ्यपुस्तक"],
+                "websites": ["दीक्षा पोर्टल (DIKSHA Portal)", "NCERT e-Resources"],
+                "videos": ["शैक्षणिक वीडियो एवं ऑडियो क्लिप्स"]
+            }
         }
-    }
+    elif subject == "SANSKRIT":
+        return {
+            "curriculum_goal": f"लक्ष्यम्-3: संस्कृतभाषायाः बोधगहनम्, नैतिकमूल्यानां विकासः तथा भाषाकौशलानां सम्पादनम्।",
+            "relevant_competencies": [
+                f"दक्षता-3.1: '{chapter}' पाठस्य शुद्धोच्चारणम्, वाचनम् एवं अर्थग्रहणम्।",
+                "दक्षता-3.2: व्याकरणनियमानां तथा शब्दरूपाणां/धातुरूपाणां सम्यक् प्रयोगः।",
+                "दक्षता-3.3: व्यावहारिकसंस्कृते वाक्यनिर्माणकौशलस्य विकासः।"
+            ],
+            "learning_objectives": [
+                f"पाठस्य '{chapter}' मूलभावस्य अवगमनम्।",
+                "नूतनशब्दानां श्लोकानां च अन्वयसहितं अर्थबोधः।",
+                "संस्कृतव्याकरणस्य पदपरिचयस्य च ज्ञानम्।"
+            ],
+            "expected_learning_outcomes": [
+                f"छात्राः '{chapter}' पाठस्य श्लोकानाम्/गद्यांशानां सरधार्थं वक्तुं समर्थाः भविष्यन्ति।",
+                "प्रश्नोत्तराणि संस्कृतभाषायाम् एव लेखिष्यन्ति।"
+            ],
+            "teaching_methodology": [
+                "अन्वय विधिः (Anvaya Method)", "पाठ्यपुस्तक विधिः", "अभ्यास विधिः"
+            ],
+            "teaching_aids": [
+                "श्यामपट्टः / स्मार्ट बोर्ड", "शब्दरूप/धातु-चित्रपटम्", "दृश्य-श्रव्य सामग्री"
+            ],
+            "art_integration": [
+                f"'{chapter}' श्लोकगायनम् / स्वरचित-चित्रांकनम्"
+            ],
+            "previous_knowledge": [
+                "पूर्वाधीतशब्दानां तथा व्याकरणस्य पुनरावृत्तिः।"
+            ],
+            "innovative_techniques": [
+                "संस्कृत सम्भाषणम्", "डिजिटल-श्लोकगायनम्", "माइंड मैपिंग"
+            ],
+            "content_points": [
+                {"section": "पाठपरिचयः", "topics": [f"'{chapter}' पाठस्य पृष्ठभूमिः सारः च"]},
+                {"section": "वाचनम् एवं व्याख्या", "topics": ["शुद्ध वाचनम्, अन्वयः, कठिनशब्दानाम् अर्थः"]},
+                {"section": "व्याकरणाभ्यासः", "topics": ["सन्धि, समासः, प्रत्ययः, शब्दरूप-धातु रूप प्रयोगः"]}
+            ],
+            "projects_experiential": [
+                f"'{chapter}' पाठस्य श्लोकान् कण्ठस्थीकृत्य कुरुत।"
+            ],
+            "skills_acquired": [
+                "उच्चारणम्", "अवबोधनम्", "संस्कृत-भाषणम्", "लेखनम्"
+            ],
+            "values_inculcated": [
+                "भारतीयसंस्कृतिः", "सदाचारः", "नैतिकता", "अनुशासनम्"
+            ],
+            "multiple_assessment": {
+                "oral_questions": [f"'{chapter}' पाठे मुख्यः संदेशः कः अस्ति?"],
+                "worksheet": ["प्रश्नोत्तराणि", "रिक्तस्थानपूर्तिः", "मेलयनं कुरुत"],
+                "practical": ["श्लोकगायनम् तथा शुद्धोच्चारणम्"],
+                "exit_ticket": ["एकं नूतनं संस्कृतशब्दं तस्य अर्थं च लिखत।"]
+            },
+            "class_work": ["अभ्यासकार्याणां समाधानम्", "शब्दार्थानां लेखनम्"],
+            "home_work": [f"'{chapter}' पाठस्य श्लोकानां सरधार्थं लिखत।"],
+            "remedial_measures": {
+                "slow_learners": ["वर्णमाला/मात्रा पुनरावृत्तिः", "व्यक्तिगतध्यानम्"],
+                "advanced_learners": ["अतिरिक्त-संस्कृत-कथावाचनम्"]
+            },
+            "resources": {
+                "books": [f"NCERT कक्षा {grade} संस्कृत पाठ्यपुस्तकम् (रुचिरा/शेमुषी)"],
+                "websites": ["दीक्षा पोर्टल (DIKSHA Portal)"],
+                "videos": ["संस्कृत-शैक्षणिक-वीडियो"]
+            }
+        }
+    else:
+        # English Default Generator for Science, Math, SST, English, etc.
+        return {
+            "curriculum_goal": f"CG-3: Explores {subject} by understanding foundational concepts, processes, and interactions, while promoting responsible and analytical practices.",
+            "relevant_competencies": [
+                f"C-3.1: Explains core principles of {chapter} through observation and scientific understanding.",
+                "C-3.2: Relates theoretical concepts to real-world phenomena and practical applications.",
+                "C-3.3: Demonstrates responsible behavior, informed decision-making, and analytical practices based on knowledge."
+            ],
+            "learning_objectives": [
+                f"Explain the primary concepts and mechanisms of {chapter}.",
+                "Identify key terms, definitions, and underlying scientific/academic principles.",
+                "Understand practical applications in daily life and industrial contexts.",
+                "Relate theoretical models with environmental and real-world interactions."
+            ],
+            "expected_learning_outcomes": [
+                f"Explain key definitions and core mechanisms of {chapter} with examples.",
+                "Demonstrate understanding using practical experiments or case studies.",
+                "Differentiate between primary concepts, classifications, and components.",
+                "Apply acquired concepts in daily life and academic assessments."
+            ],
+            "teaching_methodology": [
+                "Inquiry Based Learning", "Activity Based Learning", "Demonstration Method",
+                "Cooperative Learning", "Think-Pair-Share", "Experiential Learning"
+            ],
+            "teaching_aids": [
+                "Smart Board / Interactive PPT", "NCERT Animations & Videos",
+                "Worksheets & Handouts", "Demonstration Equipment & Charts"
+            ],
+            "art_integration": [
+                f"{chapter} Mind Map / Flow Chart", "Concept Posters & Infographics"
+            ],
+            "previous_knowledge": [
+                f"Why does this phenomenon occur in daily life related to {subject}?",
+                f"Where do we observe the practical applications of {chapter} around us?"
+            ],
+            "innovative_techniques": [
+                "Blended Learning", "QR Code Videos", "Interactive PPT", "Mind Mapping", "Exit Tickets"
+            ],
+            "content_points": [
+                {"section": "Introduction & Fundamentals", "topics": [f"Basic definitions and importance of {chapter}", "Everyday life examples"]},
+                {"section": "Core Concept Analysis", "topics": ["Detailed theoretical framework", "Mechanisms and structural breakdown"]},
+                {"section": "Review & Synthesis", "topics": ["Concept mapping and summary worksheets"]}
+            ],
+            "projects_experiential": [
+                f"Demonstrate core principles of {chapter} using simple materials.",
+                f"Construct a working model or visual poster detailing {chapter}."
+            ],
+            "skills_acquired": [
+                "Observation", "Critical Thinking", "Classification", "Data Analysis", "Teamwork"
+            ],
+            "values_inculcated": [
+                "Environmental Awareness", "Scientific Temper", "Curiosity", "Responsibility"
+            ],
+            "multiple_assessment": {
+                "oral_questions": [f"What is the core principle of {chapter}?", "Give two real-life examples."],
+                "worksheet": ["MCQs", "Assertion–Reason", "Short Answer Questions"],
+                "practical": ["Experiment Performance / Practical Demonstration"],
+                "exit_ticket": ["Write one new concept learned today and one real-life application."]
+            },
+            "class_work": ["Concept Notes & Diagrams", "Solving NCERT Worksheet Questions"],
+            "home_work": [f"Prepare a detailed concept map of {chapter}.", "Answer review questions from textbook."],
+            "remedial_measures": {
+                "slow_learners": ["Visual aids & peer tutoring", "Simplified worksheets"],
+                "advanced_learners": ["Advanced application assignments", "Case study analysis"]
+            },
+            "resources": {
+                "books": [f"NCERT {grade} {subject} Textbook"],
+                "websites": ["DIKSHA Portal", "NCERT e-Resources"],
+                "videos": ["NCERT Official Videos", "Khan Academy"]
+            }
+        }
 
 # ---------------------------------------------------------
 # WORD DOCUMENT GENERATOR (.DOCX)
@@ -350,7 +474,7 @@ with col_s:
     section = st.text_input("Section", "B")
 
 month = st.sidebar.selectbox("Month", ["APRIL", "MAY", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER", "JANUARY", "FEBRUARY"])
-chapter = st.sidebar.text_input("Chapter / Topic", "Heat Transfer in Nature")
+chapter = st.sidebar.text_input("Chapter / Topic", "सूरदास के पद")
 periods = st.sidebar.number_input("No. of Periods", min_value=1, max_value=25, value=8)
 
 # ---------------------------------------------------------
