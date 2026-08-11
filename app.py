@@ -1,6 +1,7 @@
 import streamlit as st
 import io
 import docx
+import graphviz
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
@@ -18,7 +19,7 @@ from reportlab.lib import colors
 st.set_page_config(page_title="ABPS Baikunth - Advanced Lesson Plan Generator", layout="wide")
 
 st.title("🏫 The Aditya Birla Public School, Baikunth")
-st.caption("Integrated NCF-SE 2023 | NEP 2020 Multi-Subject Lesson Plan Generator")
+st.caption("Integrated NCF-SE 2023 | NEP 2020 Multi-Subject Lesson Plan & Mind Map Generator")
 
 # ---------------------------------------------------------
 # DYNAMIC MULTI-SUBJECT GENERATION ENGINE
@@ -330,7 +331,7 @@ def build_comprehensive_plan(subject, grade, section, chapter, month, periods):
             }
         }
 
-    # --- GENERAL ACADEMIC SUBJECTS (Science, Math, SST, English, etc.) ---
+    # --- GENERAL ACADEMIC SUBJECTS ---
     else:
         return {
             "curriculum_goal": f"CG-3: Explores core domain knowledge in {subject} through structured scientific inquiry, analytical problem solving, and real-world application.",
@@ -645,7 +646,7 @@ with col_s:
     section = st.text_input("Section", "B")
 
 month = st.sidebar.selectbox("Month", ["APRIL", "MAY", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER", "JANUARY", "FEBRUARY"])
-chapter = st.sidebar.text_input("Chapter / Topic", "Fundamental Rhythms & Scale")
+chapter = st.sidebar.text_input("Chapter / Topic", "Fundamental Concepts & Practice")
 periods = st.sidebar.number_input("No. of Periods", min_value=1, max_value=25, value=8)
 
 # ---------------------------------------------------------
@@ -681,6 +682,38 @@ if 'plan_data' in st.session_state:
         st.markdown("### Expected Outcomes")
         for outcome in data['expected_learning_outcomes']:
             st.markdown(f"- {outcome}")
+
+    # =========================================================
+    # 🧠 AUTOMATIC VISUAL MIND MAP GENERATOR
+    # =========================================================
+    st.divider()
+    st.subheader(f"🧠 Visual Mind Map: {meta['chapter']}")
+
+    dot = graphviz.Digraph(comment=meta['chapter'])
+    dot.attr(rankdir='LR', size='8,5', node_style='filled', fillcolor='#EBF8FF', color='#2B6CB0', fontname='Helvetica')
+
+    # Central Chapter Node
+    dot.node('CENTER', meta['chapter'], shape='box', fillcolor='#2B6CB0', fontcolor='white')
+
+    # Dynamically extract and connect subtopics from content points
+    subtopic_idx = 0
+    for item in data.get('content_points', []):
+        section_name = item.get('section', 'Core Concepts')
+        section_id = f"SEC_{subtopic_idx}"
+        
+        # Add Section Node
+        dot.node(section_id, section_name, shape='ellipse', fillcolor='#E2E8F0')
+        dot.edge('CENTER', section_id)
+        
+        # Add Subtopic Nodes under each section
+        for topic in item.get('topics', []):
+            topic_id = f"TOP_{subtopic_idx}"
+            dot.node(topic_id, topic, shape='plaintext')
+            dot.edge(section_id, topic_id)
+            subtopic_idx += 1
+
+    st.graphviz_chart(dot, use_container_width=True)
+    # =========================================================
 
     st.divider()
     
