@@ -22,11 +22,248 @@ st.title("🏫 The Aditya Birla Public School, Baikunth")
 st.caption("Integrated NCF-SE 2023 | NEP 2020 Multi-Subject Lesson Plan & Mind Map Generator")
 
 # ---------------------------------------------------------
-# DYNAMIC MULTI-SUBJECT GENERATION ENGINE
+# DYNAMIC MULTI-SUBJECT GENERATION ENGINE (WITH FORMULAS)
 # ---------------------------------------------------------
 def build_comprehensive_plan(subject, grade, section, chapter, month, periods):
-    # --- MUSIC ---
-    if subject == "MUSIC":
+    
+    # -----------------------------------------------------
+    # 1. MATHEMATICS (Formulas, Theorems & Proofs)
+    # -----------------------------------------------------
+    if subject == "MATHEMATICS":
+        return {
+            "curriculum_goal": f"CG-MATH-1: Develops logical reasoning, abstract thinking, mathematical modeling, and problem-solving skills through quantitative analysis.",
+            "relevant_competencies": [
+                f"C-M1: Applies core mathematical theorems, formulas, and algebraic identities related to '{chapter}'.",
+                "C-M2: Demonstrates accuracy in step-by-step calculations, graphical representations, and geometric proofs.",
+                "C-M3: Solves real-world contextual problems using mathematical modeling and quantitative logic."
+            ],
+            "learning_objectives": [
+                f"Understand the theoretical derivation and practical application of formulas in '{chapter}'.",
+                "Master step-by-step algorithms and computational techniques.",
+                "Apply mathematical theorems to solve standard and exemplar numerical problems.",
+                "Develop error-analysis and verification strategies for calculated results."
+            ],
+            "expected_learning_outcomes": [
+                f"Students will accurately state and apply formulas associated with '{chapter}'.",
+                "Solve multi-step numerical exercises and geometric/algebraic proofs independently.",
+                "Construct accurate graphs, geometric constructions, or statistical tables."
+            ],
+            "formulas_and_equations": [
+                f"Core Formula 1 ({chapter}): Area / Perimeter / Algebraic Identity: A = ½ × b × h | (a+b)² = a² + 2ab + b²",
+                f"Core Formula 2 ({chapter}): Standard Equation / Theorem: Pyhtagoras Theorem: a² + b² = c²",
+                "Conversion & Constant Ratios: π ≈ 22/7 or 3.14159, Percentage / Ratio Formulae",
+                "Verification Identity: L.H.S = R.H.S verification protocols"
+            ],
+            "teaching_methodology": [
+                "Inductive-Deductive Problem Solving", "Step-by-Step Board Work",
+                "Guided Exemplar Practice", "Math Lab Hands-On Activities"
+            ],
+            "teaching_aids": [
+                "GeoGebra / Interactive Geometry Software", "Math Lab Geometry Kits & Graph Boards", "Formula Reference Flashcards"
+            ],
+            "art_integration": [
+                f"Symmetry & Tessellation Art Project based on mathematical shapes in '{chapter}'", "Geometrical Pattern Posters"
+            ],
+            "previous_knowledge": [
+                "Prerequisite operations (addition, multiplication, basic algebraic simplification).",
+                "Understanding of basic geometric shapes and foundational formula applications."
+            ],
+            "innovative_techniques": [
+                "GeoGebra Visualizer", "Step-by-step Formula Wheel", "Peer Error-Analysis Drills"
+            ],
+            "content_points": [
+                {"section": "Theoretical Concepts & Formulas", "topics": [f"Derivation of core formulas and key definitions in '{chapter}'"]},
+                {"section": "Guided Exemplar Problems", "topics": ["Step-by-step walkthrough of NCERT textbook sample problems"]},
+                {"section": "Independent Practice & Graphs", "topics": ["Solving exercise numericals, graphical plots, and word problems"]}
+            ],
+            "projects_experiential": [
+                f"Construct a real-world mathematical model or scale drawing demonstrating '{chapter}'."
+            ],
+            "skills_acquired": [
+                "Computational Speed", "Logical Deduction", "Spatial Visualization", "Error Checking"
+            ],
+            "values_inculcated": [
+                "Precision & Accuracy", "Persistence in Problem Solving", "Systematic Thinking"
+            ],
+            "multiple_assessment": {
+                "oral_questions": [f"State the main formula used in '{chapter}'.", "What is the condition for formula applicability?"],
+                "worksheet": ["Formula substitution numericals", "NCERT Exemplar short answer questions"],
+                "practical": ["Math Lab Activity & Graphical Verification Worksheet"],
+                "exit_ticket": ["Write down the core formula learned today with its SI units or variable definitions."]
+            },
+            "class_work": ["Solving Exercise Questions in notebook", "Board numerical practice"],
+            "home_work": [f"Complete textbook exercise questions for '{chapter}' and create a Formula Revision Chart."],
+            "remedial_measures": {
+                "slow_learners": ["Formula memory flashcards", "Step-by-step guided calculation templates"],
+                "advanced_learners": ["CBSE High-Order Thinking Skills (HOTS) and Olympiad problems"]
+            },
+            "resources": {
+                "books": [f"NCERT Class {grade} Mathematics", "CBSE Exemplar Problems"],
+                "websites": ["DIKSHA Math Modules", "GeoGebra Online"],
+                "videos": ["Khan Academy Mathematics", "NCERT Virtual Lab Videos"]
+            }
+        }
+
+    # -----------------------------------------------------
+    # 2. PHYSICS (Laws, Numerical Formulas & SI Units)
+    # -----------------------------------------------------
+    elif subject in ["PHYSICS", "SCIENCE"] and ("FORCE" in chapter.upper() or "MOTION" in chapter.upper() or "LIGHT" in chapter.upper() or "ELECTRICITY" in chapter.upper() or "ENERGY" in chapter.upper() or subject == "PHYSICS"):
+        return {
+            "curriculum_goal": f"CG-PHY-1: Explores natural physical phenomena through systematic inquiry, quantitative laws, mathematical modeling, and experimental physics.",
+            "relevant_competencies": [
+                f"C-P1: Understands and applies foundational laws of physics, equations of motion, and field principles for '{chapter}'.",
+                "C-P2: Derives numerical formulas, performs vector/scalar computations, and verifies physical constants.",
+                "C-P3: Conducts laboratory experiments, records observation tables, and analyzes physical graph trends."
+            ],
+            "learning_objectives": [
+                f"State the foundational physical laws and principles governing '{chapter}'.",
+                "Understand the mathematical derivation of key equations and SI unit dimensions.",
+                "Solve conceptual problems and numerical exercises using standard units.",
+                "Analyze experimental graphs (e.g., v-t graphs, V-I graphs, ray diagrams)."
+            ],
+            "expected_learning_outcomes": [
+                f"Students will accurately state laws and apply equations associated with '{chapter}'.",
+                "Convert physical quantities into standard SI units and calculate numerical outputs.",
+                "Construct accurate ray diagrams, circuit diagrams, or motion graphs."
+            ],
+            "formulas_and_equations": [
+                f"Kinematics / Dynamics: v = u + at | s = ut + ½at² | v² - u² = 2as | F = m·a",
+                f"Work & Energy / Power: W = F·d·cos(θ) | P = W/t | E = mgh | KE = ½mv²",
+                f"Electricity / Waves: V = I·R | P = V·I | f = 1/T | v = f·λ",
+                "Standard Constants & SI Units: g = 9.8 m/s², SI Units: Newton (N), Joule (J), Watt (W), Volt (V), Ohm (Ω)"
+            ],
+            "teaching_methodology": [
+                "Demonstration & Laboratory Experimentation", "Inquiry-Based Learning",
+                "Mathematical Problem-Solving Sessions", "Interactive Physics Simulations"
+            ],
+            "teaching_aids": [
+                "PhET Interactive Physics Simulations", "Physics Lab Apparatus & Multimeters", "Circuit Boards & Optical Benches"
+            ],
+            "art_integration": [
+                f"Infographic Poster on 'Physics Laws in Daily Life' for '{chapter}'", "Ray/Circuit Diagram Art"
+            ],
+            "previous_knowledge": [
+                "Understanding of basic measurement units (meters, seconds, kilograms).",
+                "Basic algebraic rearrangement of equations."
+            ],
+            "innovative_techniques": [
+                "PhET Digital Simulations", "Slow-Motion Video Analysis of Motion", "Exit Ticket Quiz"
+            ],
+            "content_points": [
+                {"section": "Laws & Principles", "topics": [f"Statement of fundamental physical laws and definitions in '{chapter}'"]},
+                {"section": "Mathematical Derivations & Formulas", "topics": ["Deriving equations, dimensional analysis, and SI unit units"]},
+                {"section": "Experimental Setup & Numericals", "topics": ["Lab demonstration, graph plotting, and numerical walkthroughs"]}
+            ],
+            "projects_experiential": [
+                f"Build a working physics toy model or working circuit demonstration for '{chapter}'."
+            ],
+            "skills_acquired": [
+                "Scientific Inquiry", "Graph Interpretation", "Numerical Precision", "Lab Safety"
+            ],
+            "values_inculcated": [
+                "Objectivity", "Curiosity about Natural Laws", "Safety Awareness"
+            ],
+            "multiple_assessment": {
+                "oral_questions": [f"State the physical law studied in '{chapter}'.", "What is the SI unit of key variables?"],
+                "worksheet": ["Formula substitution and unit conversion numericals", "Ray/Circuit diagram completion"],
+                "practical": ["Physics Lab Experiment & Observation Table Recording"],
+                "exit_ticket": ["Write down the core equation learned today with SI units."]
+            },
+            "class_work": ["Solving physics numericals in notebook", "Lab experiment recording"],
+            "home_work": [f"Solve numerical exercises for '{chapter}' and construct a Law & Formula Summary Table."],
+            "remedial_measures": {
+                "slow_learners": ["Formula triangle visual guides (e.g., V=I·R triangle)", "Units matching worksheets"],
+                "advanced_learners": ["CBSE HOTS questions and multi-concept combined numericals"]
+            },
+            "resources": {
+                "books": [f"NCERT Class {grade} Physics/Science", "CBSE Lab Manual"],
+                "websites": ["PhET Interactive Simulations", "DIKSHA Portal"],
+                "videos": ["NCERT Physics Lab Demonstrations", "Khan Academy Physics"]
+            }
+        }
+
+    # -----------------------------------------------------
+    # 3. CHEMISTRY (Chemical Reactions, Formulas & Equations)
+    # -----------------------------------------------------
+    elif subject in ["CHEMISTRY", "SCIENCE"] and ("CHEMICAL" in chapter.upper() or "ACID" in chapter.upper() or "ATOM" in chapter.upper() or "ORGANIC" in chapter.upper() or "PERIODIC" in chapter.upper() or subject == "CHEMISTRY"):
+        return {
+            "curriculum_goal": f"CG-CHEM-1: Investigates atomic structure, chemical transformations, reaction mechanisms, and stoichiometry through scientific experimentation.",
+            "relevant_competencies": [
+                f"C-C1: Balances chemical equations, predicts reaction products, and understands stoichiometric ratios in '{chapter}'.",
+                "C-C2: Applies periodic trends, chemical bonding concepts, and molecular structure representations.",
+                "C-C3: Conducts lab experiments safely, observing color changes, gas evolution, and precipitate formation."
+            ],
+            "learning_objectives": [
+                f"Understand atomic/molecular structures and chemical formulas relevant to '{chapter}'.",
+                "Master balancing chemical equations and applying the Law of Conservation of Mass.",
+                "Identify types of reactions (Combination, Decomposition, Redox, Substitution, Acid-Base).",
+                "Perform stoichiometric mole concept calculations."
+            ],
+            "expected_learning_outcomes": [
+                f"Students will write balanced chemical equations and formulas for '{chapter}'.",
+                "Identify chemical reaction indicators (pH, precipitate, gas evolution, heat transfer).",
+                "Calculate molar masses, mole ratios, or concentration terms accurately."
+            ],
+            "formulas_and_equations": [
+                f"General Reaction Representation: Reactants (A + B) ──► Products (C + D)",
+                f"Mole Concept Formulas: Moles (n) = Given Mass (m) / Molar Mass (M) | N = n × 6.022 × 10²³",
+                f"pH & Concentration Equations: pH = -log[H⁺] | Molarity (M) = Moles of Solute / Volume of Solution (L)",
+                "Key Balanced Reactions: CaCO₃ ──► CaO + CO₂ ↑ | 2H₂ + O₂ ──► 2H₂O | Acid + Base ──► Salt + Water"
+            ],
+            "teaching_methodology": [
+                "Lab Experimentation & Demonstration", "Equation Balancing Drills",
+                "Molecular Model Building", "Inquiry-Based Chemical Observation"
+            ],
+            "teaching_aids": [
+                "Chemistry Lab Reagents & Test Tubes", "3D Molecular Model Kits", "Periodic Table Visual Charts"
+            ],
+            "art_integration": [
+                f"Periodic Table Art / Reaction Flowchart Wall Chart for '{chapter}'", "Color-coded pH Scale Art"
+            ],
+            "previous_knowledge": [
+                "Symbols of elements and basic valency rules.",
+                "Distinction between physical and chemical changes."
+            ],
+            "innovative_techniques": [
+                "3D Molecular AR/VR Apps", "Equation Balancing Card Game", "Interactive Periodic Table"
+            ],
+            "content_points": [
+                {"section": "Chemical Concepts & Valency", "topics": [f"Chemical symbols, valency, and molecular formulas for '{chapter}'"]},
+                {"section": "Balanced Equations & Mechanisms", "topics": ["Step-by-step balancing of equations and reaction types"]},
+                {"section": "Lab Observation & Stoichiometry", "topics": ["Experimental observations, heat changes, and mole calculations"]}
+            ],
+            "projects_experiential": [
+                f"Perform a natural indicator or safe home-chemistry reaction demonstration for '{chapter}'."
+            ],
+            "skills_acquired": [
+                "Chemical Equation Balancing", "Lab Reagent Handling", "Observation & Inferences", "Precise Measurement"
+            ],
+            "values_inculcated": [
+                "Laboratory Safety", "Environmental Green Chemistry", "Scientific Accuracy"
+            ],
+            "multiple_assessment": {
+                "oral_questions": [f"Name the key chemical compound in '{chapter}'.", "How do you test for gas evolution?"],
+                "worksheet": ["Equation balancing exercises", "Mole concept numericals"],
+                "practical": ["Chemical Reaction Test Tube Experiment & Observation Recording"],
+                "exit_ticket": ["Write down one balanced chemical equation learned today."]
+            },
+            "class_work": ["Balancing chemical equations on board", "Notebook reaction charts"],
+            "home_work": [f"Complete textbook exercise equations for '{chapter}' and write a Chemical Formula Table."],
+            "remedial_measures": {
+                "slow_learners": ["Valency cross-multiplication method flashcards", "Pre-balanced equation templates"],
+                "advanced_learners": ["Redox reaction balancing (ion-electron method) and stoichiometry challenges"]
+            },
+            "resources": {
+                "books": [f"NCERT Class {grade} Chemistry/Science", "CBSE Science Manual"],
+                "websites": ["Royal Society of Chemistry", "DIKSHA Portal"],
+                "videos": ["NCERT Chemistry Practical Videos", "Khan Academy Chemistry"]
+            }
+        }
+
+    # -----------------------------------------------------
+    # 4. MUSIC, ART & DANCE
+    # -----------------------------------------------------
+    elif subject == "MUSIC":
         return {
             "curriculum_goal": f"CG-ART-1: Develops aesthetic sensibility, rhythmic awareness, and cultural appreciation through vocal and instrumental music.",
             "relevant_competencies": [
@@ -37,301 +274,104 @@ def build_comprehensive_plan(subject, grade, section, chapter, month, periods):
             "learning_objectives": [
                 f"Identify and sing/play the core Swaras/Taal associated with '{chapter}'.",
                 "Understand the tempo (Laya) and rhythmic structure (Matra/Tali/Khali).",
-                "Develop ear training, pitch accuracy, and voice modulation.",
-                "Appreciate the cultural significance and composer history of the composition."
+                "Develop ear training, pitch accuracy, and voice modulation."
             ],
             "expected_learning_outcomes": [
                 f"Students will perform '{chapter}' with accurate pitch (Swar) and rhythm (Taal).",
-                "Identify and count Matras using hand beats (Tali/Khali).",
-                "Demonstrate improved vocal flexibility or instrumental coordination."
+                "Identify and count Matras using hand beats (Tali/Khali)."
             ],
-            "teaching_methodology": [
-                "Demonstration & Imitation Method (Riyaz)", "Guided Vocal Practice",
-                "Group Choral Singing", "Rhythmic Clapping & Beat Counting"
+            "formulas_and_equations": [
+                "Rhythmic Structure (Taal Notation): Total Matras = Tali Beats + Khali Beats",
+                "Scale Ratio (Saptak): Mandra (Lower) : Madhya (Middle) : Tara (Higher) Saptak",
+                "Tempo Ratios (Laya): Vilambit (1x) ──► Madhya (2x) ──► Drut (4x)"
             ],
-            "teaching_aids": [
-                "Harmonium / Tanpura / Tabla", "Audio Recordings & Metronome", "Notation Charts"
-            ],
-            "art_integration": [
-                f"Musical Rendition & Rhythmic Ensemble on '{chapter}'", "Lyric Illustration Poster"
-            ],
-            "previous_knowledge": [
-                "Are students familiar with basic Saptak (Swara) and simple rhythmic patterns?",
-                "Prior experience in community or assembly singing."
-            ],
-            "innovative_techniques": [
-                "Digital Metronome Practice", "Audio Self-Recording Analysis", "Interactive Music Quiz"
-            ],
+            "teaching_methodology": ["Demonstration & Imitation Method (Riyaz)", "Guided Vocal Practice", "Group Choral Singing"],
+            "teaching_aids": ["Harmonium / Tanpura / Tabla", "Audio Recordings & Metronome", "Notation Charts"],
+            "art_integration": [f"Musical Rendition & Rhythmic Ensemble on '{chapter}'"],
+            "previous_knowledge": ["Familiarity with basic Saptak (Swara) and simple rhythmic patterns."],
+            "innovative_techniques": ["Digital Metronome Practice", "Audio Self-Recording Analysis"],
             "content_points": [
                 {"section": "Introduction & Aaroh-Avaroh", "topics": [f"Basic scale/Thaat introduction and Swara alignment for '{chapter}'"]},
-                {"section": "Composition & Bandish Practice", "topics": ["Line-by-line vocal demonstration, lyrics meaning, and Riyaz"]},
-                {"section": "Taal & Rhythm Sync", "topics": ["Hand beats, Matra alignment, and tempo variation (Vilambit/Drut)"]}
+                {"section": "Composition & Bandish Practice", "topics": ["Line-by-line vocal demonstration, lyrics meaning, and Riyaz"]}
             ],
-            "projects_experiential": [
-                f"Prepare a small group choir or solo musical presentation on '{chapter}'."
-            ],
-            "skills_acquired": [
-                "Aural Perception", "Rhythmic Precision", "Vocal Control", "Stage Performance"
-            ],
-            "values_inculcated": [
-                "Cultural Heritage Respect", "Patience & Discipline", "Team Harmony"
-            ],
+            "projects_experiential": [f"Prepare a small group choir or solo musical presentation on '{chapter}'."],
+            "skills_acquired": ["Aural Perception", "Rhythmic Precision", "Vocal Control"],
+            "values_inculcated": ["Cultural Heritage Respect", "Patience & Discipline"],
             "multiple_assessment": {
-                "oral_questions": [f"Name the primary Taal or Swaras used in '{chapter}'?", "Define Aaroh and Avaroh."],
-                "worksheet": ["Identify missing Swaras in notation", "Match Taal with its total Matras"],
-                "practical": ["Solo/Group Vocal & Instrumental Performance Test"],
+                "oral_questions": [f"Name the primary Taal or Swaras used in '{chapter}'?"],
+                "worksheet": ["Identify missing Swaras in notation"],
+                "practical": ["Solo/Group Vocal Performance Test"],
                 "exit_ticket": ["Demonstrate 1 Avartan of the assigned Taal with hand beats."]
             },
-            "class_work": ["Notation writing in notebook", "Group Riyaz and vocal warm-ups"],
-            "home_work": [f"Practice 15 minutes daily Riyaz of '{chapter}'.", "Memorize lyrics and notation."],
+            "class_work": ["Notation writing in notebook", "Group Riyaz"],
+            "home_work": [f"Practice 15 minutes daily Riyaz of '{chapter}'."],
             "remedial_measures": {
-                "slow_learners": ["Individual Swara tuning assistance", "Slower tempo practice"],
-                "advanced_learners": ["Aalap & Taam practice", "Harmonium accompaniment training"]
+                "slow_learners": ["Individual Swara tuning assistance"],
+                "advanced_learners": ["Aalap & Taam practice"]
             },
             "resources": {
-                "books": ["CBSE Music Curriculum Guide", "Sangeet Visharad Basics"],
-                "websites": ["NCERT e-Music Resources", "SWAYAM Portal"],
-                "videos": ["Classical Vocal Demonstrations", "Interactive Tabla Beat Loops"]
+                "books": ["CBSE Music Curriculum Guide"],
+                "websites": ["NCERT e-Music Resources"],
+                "videos": ["Classical Vocal Demonstrations"]
             }
         }
 
-    # --- ART & CRAFT ---
-    elif subject == "ART & CRAFT":
-        return {
-            "curriculum_goal": f"CG-ART-2: Enhances visual literacy, creative expression, fine motor skills, and spatial awareness through hands-on art exploration.",
-            "relevant_competencies": [
-                f"C-2.1: Applies fundamental elements of art (line, shape, color, texture) in '{chapter}'.",
-                "C-2.2: Demonstrates control over tools, mediums, and crafting techniques.",
-                "C-2.3: Evaluates artwork through aesthetic reflection and creative problem-solving."
-            ],
-            "learning_objectives": [
-                f"Master color mixing, shading, or structural crafting techniques for '{chapter}'.",
-                "Understand perspective, balance, and proportions in visual composition.",
-                "Explore sustainable, upcycled, or local craft materials for artistic creation.",
-                "Develop hand-eye coordination and spatial arrangement skills."
-            ],
-            "expected_learning_outcomes": [
-                f"Students will create an original artwork or craft model based on '{chapter}'.",
-                "Demonstrate correct usage of shading, blending, or sculpting mediums.",
-                "Explain the artistic choices and color harmonies used in their art piece."
-            ],
-            "teaching_methodology": [
-                "Step-by-Step Visual Demonstration", "Studio Practice & Hands-on Creation",
-                "Peer Gallery Walk & Critique", "Experimental Medium Exploration"
-            ],
-            "teaching_aids": [
-                "Drawing Sheets, Paints, Brushes & Craft Tools", "Sample Artwork Models", "Visual Reference Charts"
-            ],
-            "art_integration": [
-                f"Cross-curricular poster art linking '{chapter}' with Environmental/Social Studies"
-            ],
-            "previous_knowledge": [
-                "Basic understanding of primary colors and geometric shapes.",
-                "Handling safety with scissors, brushes, and glue."
-            ],
-            "innovative_techniques": [
-                "Upcycled Material Crafting", "Digital Art Reference Boards", "Visual Storytelling"
-            ],
-            "content_points": [
-                {"section": "Concept & Color Theory", "topics": [f"Understanding color harmonies and design layouts for '{chapter}'"]},
-                {"section": "Hands-on Crafting / Sketching", "topics": ["Guided line drawing, proportion drafting, and texture building"]},
-                {"section": "Finishing & Presentation", "topics": ["Outlining, highlights, border presentation, and display setup"]}
-            ],
-            "projects_experiential": [
-                f"Create a 3D craft model or detailed canvas painting based on '{chapter}'."
-            ],
-            "skills_acquired": [
-                "Visual-Spatial Reasoning", "Fine Motor Control", "Creative Innovation", "Aesthetic Judgement"
-            ],
-            "values_inculcated": [
-                "Resourcefulness", "Environmental Upcycling", "Patience", "Appreciation for Local Crafts"
-            ],
-            "multiple_assessment": {
-                "oral_questions": ["What are complementary colors?", "How does texture add depth to artwork?"],
-                "worksheet": ["Label color wheel zones", "Match art styles with technique descriptions"],
-                "practical": ["Final Artwork Evaluation based on Neatness, Creativity, and Technique"],
-                "exit_ticket": ["State one new color blending technique learned today."]
-            },
-            "class_work": ["Sketchbook drafting", "Color mixing and final artwork composition"],
-            "home_work": [f"Collect natural/recyclable materials for the next '{chapter}' craft project."],
-            "remedial_measures": {
-                "slow_learners": ["Pre-drawn guidelines for proportion help", "Simplified color schemes"],
-                "advanced_learners": ["3D perspective rendering", "Mixed-media experimentation"]
-            },
-            "resources": {
-                "books": ["NCERT Art Education Handbook", "CBSE Fine Arts Manual"],
-                "websites": ["National Gallery of Modern Art Portal", "DIKSHA Art Modules"],
-                "videos": ["Step-by-Step Craft Tutorials", "Famous Artist Documentaries"]
-            }
-        }
-
-    # --- DANCE ---
-    elif subject == "DANCE":
-        return {
-            "curriculum_goal": f"CG-ART-3: Promotes kinesthetic intelligence, body posture, rhythm synchronization, and expressive narrative skills through dance.",
-            "relevant_competencies": [
-                f"C-3.1: Executes core footwork (Tatkkar), hand gestures (Mudras), and postures in '{chapter}'.",
-                "C-3.2: Synchronizes body movements precisely with rhythm (Taal) and musical cues.",
-                "C-3.3: Expresses emotions (Bhava/Rasa) effectively through facial expressions and body language."
-            ],
-            "learning_objectives": [
-                f"Learn and execute the fundamental dance steps and Mudras for '{chapter}'.",
-                "Develop physical stamina, flexibility, balance, and spatial alignment.",
-                "Understand the narrative or cultural story behind the dance form.",
-                "Build group coordination, timing, and stage presence."
-            ],
-            "expected_learning_outcomes": [
-                f"Students will perform the choreographed sequence of '{chapter}' in sync with music.",
-                "Identify key Asamyutta/Samyutta Hastamudras used in the routine.",
-                "Demonstrate proper posture (Aramandi/Posture) and rhythmic accuracy."
-            ],
-            "teaching_methodology": [
-                "Demonstration & Mirroring Method", "Rhythmic Movement Practice",
-                "Group Formation Choreography", "Expression (Abhinaya) Drill"
-            ],
-            "teaching_aids": [
-                "Dance Studio Mirror / Open Space", "Audio Sound System & Rhythm Track", "Mudra Reference Wall Charts"
-            ],
-            "art_integration": [
-                f"Dance Drama Adaptation on '{chapter}' integrated with Literature/History"
-            ],
-            "previous_knowledge": [
-                "Basic body warm-ups and rhythm listening skills.",
-                "Familiarity with simple counts (1-2-3-4 / Ta-Dhei-Dhei-Tat)."
-            ],
-            "innovative_techniques": [
-                "Video Movement Analysis", "Choreography Formation Mapping", "Rhythm Clapping Warm-ups"
-            ],
-            "content_points": [
-                {"section": "Body Warm-up & Posture", "topics": [f"Stretching, stamina building, and posture alignment for '{chapter}'"]},
-                {"section": "Footwork & Mudra Learning", "topics": ["Step-by-step footwork counts, hand gestures, and body coordination"]},
-                {"section": "Choreography & Expressions", "topics": ["Linking steps into full sequence with musical track and Bhava (expressions)"]}
-            ],
-            "projects_experiential": [
-                f"Choreograph a 2-minute thematic group performance on '{chapter}'."
-            ],
-            "skills_acquired": [
-                "Kinesthetic Balance", "Rhythmic Synchronization", "Expressive Communication", "Spatial Awareness"
-            ],
-            "values_inculcated": [
-                "Physical Fitness", "Cultural Respect", "Team Synergy", "Self-Confidence"
-            ],
-            "multiple_assessment": {
-                "oral_questions": ["Name two hand Mudras used today.", "What is Tatkkar in dance?"],
-                "worksheet": ["Match Mudras with their meanings", "Sequence the dance steps correctly"],
-                "practical": ["Group Dance Performance Assessment on Rhythm, Posture, and Expressions"],
-                "exit_ticket": ["Demonstrate one hand gesture learned today with correct name."]
-            },
-            "class_work": ["Floor practice of dance routine", "Mudra memorization and group formation practice"],
-            "home_work": [f"Practice the 8-count footwork sequence of '{chapter}' at home."],
-            "remedial_measures": {
-                "slow_learners": ["Slow-motion breakdown of steps", "Peer-assisted buddy practice"],
-                "advanced_learners": ["Solo improvisation", "Lead choreography assignment"]
-            },
-            "resources": {
-                "books": ["CBSE Dance & Performing Arts Curriculum", "Natya Shastra Overview"],
-                "websites": ["Sangeet Natak Akademi Portal", "DIKSHA Performing Arts"],
-                "videos": ["Classical & Folk Dance Tutorials", "Cultural Performance Archives"]
-            }
-        }
-
-    # --- HINDI ---
+    # -----------------------------------------------------
+    # 5. HINDI & SANSKRIT
+    # -----------------------------------------------------
     elif subject == "HINDI":
         return {
             "curriculum_goal": f"लक्ष्य-3: {subject} शिक्षण द्वारा भाषा-कौशल, मौलिक चिंतन, रचनात्मकता एवं साहित्यिक समझ का विकास करना।",
             "relevant_competencies": [
                 f"दक्षता-3.1: '{chapter}' पाठ का स्पष्ट उच्चारण, पठन एवं भावग्रहण करना।",
-                "दक्षता-3.2: व्याकरणिक नियमों एवं भाषिक संरचनाओं का सही प्रयोग करना।",
-                "दक्षता-3.3: व्यावहारिक जीवन एवं लेखन में नए शब्दों और विचारों का अनुप्रयोग करना।"
+                "दक्षता-3.2: व्याकरणिक नियमों एवं भाषिक संरचनाओं का सही प्रयोग करना।"
             ],
             "learning_objectives": [
                 f"पाठ '{chapter}' के मुख्य भाव, विचार एवं केंद्रीय विषय को समझना।",
-                "कठिन शब्दों के अर्थ एवं व्याकरणिक तत्वों का ज्ञान प्राप्त करना।",
-                "शुद्ध उच्चारण, वाचन एवं अभिव्यक्ति क्षमता को बढ़ाना।"
+                "कठिन शब्दों के अर्थ एवं व्याकरणिक तत्वों का ज्ञान प्राप्त करना।"
             ],
             "expected_learning_outcomes": [
                 f"विद्यार्थी '{chapter}' के प्रश्नों के उत्तर स्पष्ट रूप से देने में सक्षम होंगे।",
                 "नए शब्दावली का वाक्यों में प्रयोग कर सकेंगे।"
             ],
-            "teaching_methodology": ["वाचन विधि", "व्याख्यान विधि", "प्रश्न उत्तर विधि", "सामूहिक चर्चा"],
-            "teaching_aids": ["स्मार्ट बोर्ड / वीडियो", "चित्र एवं फ्लैश कार्ड", "पाठ्यपुस्तक"],
+            "formulas_and_equations": [
+                "व्याकरणिक नियम: संधि = वर्ण + वर्ण | समास = पद + पद",
+                "वाक्य संरचना: कर्ता + कर्म + क्रिया"
+            ],
+            "teaching_methodology": ["वाचन विधि", "व्याख्यान विधि", "प्रश्न उत्तर विधि"],
+            "teaching_aids": ["स्मार्ट बोर्ड / वीडियो", "चित्र एवं फ्लैश कार्ड"],
             "art_integration": [f"'{chapter}' पर आधारित माइंड मैप या पोस्टर निर्माण"],
             "previous_knowledge": ["पाठ से संबंधित बुनियादी शब्दावली की समझ की जाँच।"],
-            "innovative_techniques": ["माइंड मैपिंग (Mind Mapping)", "डिजिटल वाचन", "क्विज़"],
+            "innovative_techniques": ["माइंड मैपिंग (Mind Mapping)", "डिजिटल वाचन"],
             "content_points": [
                 {"section": "भूमिका एवं परिचय", "topics": [f"लेखक/कवि का परिचय एवं '{chapter}' का मुख्य सार"]},
                 {"section": "व्याख्या एवं भावार्थ", "topics": ["पाठ का वाचन, कठिन शब्दार्थ एवं व्याख्या"]}
             ],
             "projects_experiential": [f"'{chapter}' के विषय पर एक लघु अनुच्छेद या कहानी लिखें।"],
-            "skills_acquired": ["श्रवण (Listening)", "वाचन (Speaking)", "पठन (Reading)", "लेखन (Writing)"],
-            "values_inculcated": ["नैतिक मूल्य", "सांस्कृतिक चेतना", "संवेदनशीलता"],
+            "skills_acquired": ["श्रवण", "वाचन", "पठन", "लेखन"],
+            "values_inculcated": ["नैतिक मूल्य", "संवेदनशीलता"],
             "multiple_assessment": {
                 "oral_questions": [f"'{chapter}' का मुख्य संदेश क्या है?"],
-                "worksheet": ["बहुविकल्पीय प्रश्न (MCQs)", "शब्दार्थ एवं वाक्य प्रयोग"],
-                "practical": ["सस्वर वाचन एवं उच्चारण सुधार"],
+                "worksheet": ["बहुविकल्पीय प्रश्न (MCQs)"],
+                "practical": ["सस्वर वाचन अभ्यास"],
                 "exit_ticket": ["आज सीखे गए नए शब्द से एक वाक्य बनाएं।"]
             },
-            "class_work": ["पाठ्यपुस्तक के प्रश्नोत्तर लिखना", "शब्दार्थ अभ्यास"],
+            "class_work": ["पाठ्यपुस्तक के प्रश्नोत्तर लिखना"],
             "home_work": [f"'{chapter}' का सारांश अपने शब्दों में लिखें।"],
             "remedial_measures": {
-                "slow_learners": ["सस्वर वाचन अभ्यास", "चित्रों के माध्यम से समझाना"],
+                "slow_learners": ["सस्वर वाचन अभ्यास"],
                 "advanced_learners": ["मौलिक रचनात्मक लेखन"]
             },
             "resources": {
                 "books": [f"एनसीईआरटी कक्षा {grade} हिंदी पाठ्यपुस्तक"],
                 "websites": ["दीक्षा पोर्टल (DIKSHA Portal)"],
-                "videos": ["शैक्षणिक वीडियो एवं ऑडियो क्लिप्स"]
+                "videos": ["शैक्षणिक वीडियो"]
             }
         }
 
-    # --- SANSKRIT ---
-    elif subject == "SANSKRIT":
-        return {
-            "curriculum_goal": f"लक्ष्यम्-3: संस्कृतभाषायाः बोधगहनम्, नैतिकमूल्यानां विकासः तथा भाषाकौशलानां सम्पादनम्।",
-            "relevant_competencies": [
-                f"दक्षता-3.1: '{chapter}' पाठस्य शुद्धोच्चारणम्, वाचनम् एवं अर्थग्रहणम्।",
-                "दक्षता-3.2: व्याकरणनियमानां तथा शब्दरूपाणां सम्यक् प्रयोगः।"
-            ],
-            "learning_objectives": [
-                f"पाठस्य '{chapter}' मूलभावस्य अवगमनम्।",
-                "नूतनशब्दानां श्लोकानां च अन्वयसहितं अर्थबोधः।"
-            ],
-            "expected_learning_outcomes": [
-                f"छात्राः '{chapter}' पाठस्य श्लोकानाम् सरधार्थं वक्तुं समर्थाः भविष्यन्ति।",
-                "प्रश्नोत्तराणि संस्कृतभाषायाम् एव लेखिष्यन्ति।"
-            ],
-            "teaching_methodology": ["अन्वय विधिः", "पाठ्यपुस्तक विधिः", "अभ्यास विधिः"],
-            "teaching_aids": ["श्यामपट्टः / स्मार्ट बोर्ड", "शब्दरूप/धातु-चित्रपटम्"],
-            "art_integration": [f"'{chapter}' श्लोकगायनम् / चित्रांकनम्"],
-            "previous_knowledge": ["पूर्वाधीतशब्दानां तथा व्याकरणस्य पुनरावृत्तिः।"],
-            "innovative_techniques": ["संस्कृत सम्भाषणम्", "डिजिटल-श्लोकगायनम्"],
-            "content_points": [
-                {"section": "पाठपरिचयः", "topics": [f"'{chapter}' पाठस्य पृष्ठभूमिः सारः च"]},
-                {"section": "वाचनम् एवं व्याख्या", "topics": ["शुद्ध वाचनम्, अन्वयः, कठिनशब्दानाम् अर्थः"]}
-            ],
-            "projects_experiential": [f"'{chapter}' पाठस्य श्लोकान् कण्ठस्थीकृत्य कुरुत।"],
-            "skills_acquired": ["उच्चारणम्", "अवबोधनम्", "संस्कृत-भाषणम्", "लेखनम्"],
-            "values_inculcated": ["भारतीयसंस्कृतिः", "सदाचारः", "अनुशासनम्"],
-            "multiple_assessment": {
-                "oral_questions": [f"'{chapter}' पाठे मुख्यः संदेशः कः अस्ति?"],
-                "worksheet": ["प्रश्नोत्तराणि", "रिक्तस्थानपूर्तिः"],
-                "practical": ["श्लोकगायनम् तथा शुद्धोच्चारणम्"],
-                "exit_ticket": ["एकं नूतनं संस्कृतशब्दं तस्य अर्थं च लिखत।"]
-            },
-            "class_work": ["अभ्यासकार्याणां समाधानम्", "शब्दार्थानां लेखनम्"],
-            "home_work": [f"'{chapter}' पाठस्य श्लोकानां सरधार्थं लिखत।"],
-            "remedial_measures": {
-                "slow_learners": ["वर्णमाला पुनरावृत्तिः", "व्यक्तिगतध्यानम्"],
-                "advanced_learners": ["अतिरिक्त-संस्कृत-कथावाचनम्"]
-            },
-            "resources": {
-                "books": [f"NCERT कक्षा {grade} संस्कृत पाठ्यपुस्तकम्"],
-                "websites": ["दीक्षा पोर्टल (DIKSHA Portal)"],
-                "videos": ["संस्कृत-शैक्षणिक-वीडियो"]
-            }
-        }
-
-    # --- GENERAL ACADEMIC SUBJECTS ---
+    # -----------------------------------------------------
+    # 6. GENERAL ACADEMIC SUBJECTS (Default)
+    # -----------------------------------------------------
     else:
         return {
             "curriculum_goal": f"CG-3: Explores core domain knowledge in {subject} through structured scientific inquiry, analytical problem solving, and real-world application.",
@@ -343,61 +383,44 @@ def build_comprehensive_plan(subject, grade, section, chapter, month, periods):
             "learning_objectives": [
                 f"Define and explain core concepts, scientific laws, or theoretical models of '{chapter}'.",
                 "Apply analytical formulas, textual analysis, or logical frameworks to solve academic problems.",
-                "Analyze cause-and-effect relationships in practical and industrial contexts.",
-                "Synthesize learnings through diagrams, data tables, and structured writing."
+                "Analyze cause-and-effect relationships in practical contexts."
             ],
             "expected_learning_outcomes": [
                 f"Students will accurately articulate definitions, mechanisms, and key terms for '{chapter}'.",
-                "Solve conceptual problems and numerical/textual exercises independently.",
-                "Demonstrate practical understanding through experiments, case studies, or flowcharts."
+                "Solve conceptual problems and numerical/textual exercises independently."
             ],
-            "teaching_methodology": [
-                "Inquiry-Based Learning", "Problem-Solving & Case Study Method",
-                "Demonstration & Lab Experimentation", "Collaborative Peer Discussion"
+            "formulas_and_equations": [
+                f"Key Formula / Analytical Relation ({chapter}): Core Input ──► Functional Process ──► Output / Result",
+                "Standard Equations & Variable Definitions for the chapter domain"
             ],
-            "teaching_aids": [
-                "Smart Board / Interactive PPTs", "NCERT Lab Kits & Experimental Apparatus", "Worksheets & Mind Maps"
-            ],
-            "art_integration": [
-                f"Concept Mapping & Graphical Flowchart of '{chapter}'", "Infographic Poster Creation"
-            ],
-            "previous_knowledge": [
-                f"What foundational concepts from earlier grades relate to '{chapter}'?",
-                "Where do we observe this concept in daily real-world activities?"
-            ],
-            "innovative_techniques": [
-                "Blended Learning Modules", "QR Code Interactive Simulations", "Exit Tickets & Kahoot Quizzes"
-            ],
+            "teaching_methodology": ["Inquiry-Based Learning", "Problem-Solving Method", "Collaborative Peer Discussion"],
+            "teaching_aids": ["Smart Board / Interactive PPTs", "Worksheets & Mind Maps"],
+            "art_integration": [f"Concept Mapping & Graphical Flowchart of '{chapter}'"],
+            "previous_knowledge": ["What foundational concepts from earlier grades relate to this chapter?"],
+            "innovative_techniques": ["Blended Learning Modules", "Exit Tickets & Quizzes"],
             "content_points": [
                 {"section": "Theoretical Framework", "topics": [f"Introduction, definitions, and scope of '{chapter}'"]},
-                {"section": "Mechanism & Analysis", "topics": ["Step-by-step structural analysis, formulas, and working principles"]},
-                {"section": "Practical Application & Review", "topics": ["Case studies, numerical practice, and summary concept mapping"]}
+                {"section": "Mechanism & Analysis", "topics": ["Step-by-step structural analysis and working principles"]}
             ],
-            "projects_experiential": [
-                f"Conduct a mini-experiment or research survey investigating '{chapter}' in your local context."
-            ],
-            "skills_acquired": [
-                "Critical Thinking", "Analytical Reasoning", "Experimental Inquiry", "Data Interpretation"
-            ],
-            "values_inculcated": [
-                "Scientific Temper", "Environmental Responsibility", "Curiosity", "Intellectual Honesty"
-            ],
+            "projects_experiential": [f"Conduct a mini-research survey investigating '{chapter}' in your local context."],
+            "skills_acquired": ["Critical Thinking", "Analytical Reasoning", "Data Interpretation"],
+            "values_inculcated": ["Scientific Temper", "Curiosity", "Intellectual Honesty"],
             "multiple_assessment": {
-                "oral_questions": [f"Explain the main principle behind '{chapter}'.", "Give two practical examples."],
-                "worksheet": ["MCQs & Assertion-Reasoning", "Short Answer & Conceptual Questions"],
-                "practical": ["Experiment Performance & Observation Table Recording"],
+                "oral_questions": [f"Explain the main principle behind '{chapter}'."],
+                "worksheet": ["Short Answer & Conceptual Questions"],
+                "practical": ["Case Study / Observation Table Recording"],
                 "exit_ticket": ["Summarize today's core concept in 2 sentences."]
             },
-            "class_work": ["Concept notes drafting", "Solving textbook numericals and exercise questions"],
+            "class_work": ["Concept notes drafting", "Solving exercise questions"],
             "home_work": [f"Complete review questions for '{chapter}' and construct a summary mind map."],
             "remedial_measures": {
-                "slow_learners": ["Peer tutoring and visual flashcards", "Step-by-step formula worksheets"],
-                "advanced_learners": ["Exemplar problem solving", "Advanced research assignments"]
+                "slow_learners": ["Peer tutoring and visual flashcards"],
+                "advanced_learners": ["Advanced research assignments"]
             },
             "resources": {
-                "books": [f"NCERT Class {grade} {subject} Textbook", "CBSE Exemplar Manual"],
-                "websites": ["DIKSHA Portal", "NCERT e-Pathshala"],
-                "videos": ["NCERT Demonstration Videos", "Khan Academy Lessons"]
+                "books": [f"NCERT Class {grade} {subject} Textbook"],
+                "websites": ["DIKSHA Portal"],
+                "videos": ["NCERT Educational Videos"]
             }
         }
 
@@ -474,6 +497,10 @@ def generate_docx(meta, plan_data):
     add_section_table("Relevant Competencies", plan_data.get("relevant_competencies", []))
     add_section_table("Learning Objectives", plan_data.get("learning_objectives", []))
     add_section_table("Expected Learning Outcomes", plan_data.get("expected_learning_outcomes", []))
+    
+    if "formulas_and_equations" in plan_data:
+        add_section_table("Key Formulas, Laws &\nChemical Equations", plan_data.get("formulas_and_equations", []))
+
     add_section_table("Teaching Methodology", plan_data.get("teaching_methodology", []))
     
     aids_text = "Teaching Aids:\n" + "\n".join([f"• {a}" for a in plan_data.get("teaching_aids", [])])
@@ -591,6 +618,12 @@ def generate_pdf(meta, plan_data):
         [Paragraph("<b>Relevant Competencies</b>", body_style), Paragraph(make_bullet_list(plan_data.get("relevant_competencies",[])), body_style)],
         [Paragraph("<b>Learning Objectives</b>", body_style), Paragraph(make_bullet_list(plan_data.get("learning_objectives",[])), body_style)],
         [Paragraph("<b>Expected Learning Outcomes</b>", body_style), Paragraph(make_bullet_list(plan_data.get("expected_learning_outcomes",[])), body_style)],
+    ]
+
+    if "formulas_and_equations" in plan_data:
+        details_data.append([Paragraph("<b>Key Formulas & Equations</b>", body_style), Paragraph(make_bullet_list(plan_data.get("formulas_and_equations",[])), body_style)])
+
+    details_data.extend([
         [Paragraph("<b>Teaching Methodology</b>", body_style), Paragraph(make_bullet_list(plan_data.get("teaching_methodology",[])), body_style)],
         [Paragraph("<b>Teaching Aids & Integration of Arts</b>", body_style), Paragraph(aids_formatted, body_style)],
         [Paragraph("<b>Connecting Previous Knowledge</b>", body_style), Paragraph(make_bullet_list(plan_data.get("previous_knowledge",[])), body_style)],
@@ -604,7 +637,7 @@ def generate_pdf(meta, plan_data):
         [Paragraph("<b>Home Work</b>", body_style), Paragraph(make_bullet_list(plan_data.get("home_work",[])), body_style)],
         [Paragraph("<b>Remedial Measures</b>", body_style), Paragraph(rem_formatted, body_style)],
         [Paragraph("<b>Resources & References</b>", body_style), Paragraph(res_formatted, body_style)],
-    ]
+    ])
     
     details_table = Table(details_data, colWidths=[140, 400])
     details_table.setStyle(TableStyle([
@@ -646,7 +679,7 @@ with col_s:
     section = st.text_input("Section", "B")
 
 month = st.sidebar.selectbox("Month", ["APRIL", "MAY", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER", "JANUARY", "FEBRUARY"])
-chapter = st.sidebar.text_input("Chapter / Topic", "Fundamental Concepts & Practice")
+chapter = st.sidebar.text_input("Chapter / Topic", "Force and Laws of Motion")
 periods = st.sidebar.number_input("No. of Periods", min_value=1, max_value=25, value=8)
 
 # ---------------------------------------------------------
@@ -682,6 +715,15 @@ if 'plan_data' in st.session_state:
         st.markdown("### Expected Outcomes")
         for outcome in data['expected_learning_outcomes']:
             st.markdown(f"- {outcome}")
+
+    # =========================================================
+    # 📐 FORMULAS, LAWS & CHEMICAL EQUATIONS SECTION
+    # =========================================================
+    if "formulas_and_equations" in data:
+        st.divider()
+        st.subheader("📐 Key Formulas, Laws & Chemical Equations")
+        for f in data["formulas_and_equations"]:
+            st.info(f"⚡ {f}")
 
     # =========================================================
     # 🧠 AUTOMATIC VISUAL MIND MAP GENERATOR
