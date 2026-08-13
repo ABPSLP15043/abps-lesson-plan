@@ -48,7 +48,7 @@ def extract_text_from_pdf(uploaded_file, max_pages=40):
     return extracted_text
 
 # ---------------------------------------------------------
-# HELPER: CALL GEMINI API (FREE TIER: GEMINI 2.5 FLASH)
+# HELPER: CALL GEMINI API (FREE TIER: GEMINI 2.0 FLASH)
 # ---------------------------------------------------------
 def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, periods, chapter_content):
     client = genai.Client(api_key=api_key)
@@ -108,7 +108,7 @@ def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, pe
     """
 
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-2.0-flash',
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json"
