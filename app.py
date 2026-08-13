@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 import io
 import json
 import docx
@@ -21,25 +22,33 @@ from reportlab.lib import colors
 # ---------------------------------------------------------
 # PAGE CONFIGURATION
 # ---------------------------------------------------------
-st.set_page_config(page_title="ABPS Baikunth - AI Lesson Plan Generator", layout="wide")
+st.set_page_config(
+    page_title="ABPS Baikunth - AI Lesson Plan Generator",
+    page_icon="🏫",
+    layout="wide"
+)
 
 st.title("🏫 The Aditya Birla Public School, Baikunth")
-st.caption("AI-Powered NCF-SE 2023 Lesson Plan & Mind Map Generator (PDF/Text Analysis)")
+st.caption("Free AI-Powered NCF-SE 2023 Lesson Plan & Mind Map Generator")
+
+# Retrieve GEMINI_API_KEY from Render environment variables automatically
+system_api_key = os.getenv("GEMINI_API_KEY", "")
 
 # ---------------------------------------------------------
-# HELPER: EXTRACT TEXT FROM PDF
+# HELPER: EXTRACT TEXT FROM PDF (Memory Safe for <= 25 MB)
 # ---------------------------------------------------------
-def extract_text_from_pdf(uploaded_file):
+def extract_text_from_pdf(uploaded_file, max_pages=40):
     reader = PdfReader(uploaded_file)
     extracted_text = ""
-    for page in reader.pages:
-        text = page.extract_text()
+    total_pages = min(len(reader.pages), max_pages)
+    for i in range(total_pages):
+        text = reader.pages[i].extract_text()
         if text:
             extracted_text += text + "\n"
     return extracted_text
 
 # ---------------------------------------------------------
-# HELPER: CALL GEMINI AI API FOR CHAPTER ANALYSIS
+# HELPER: CALL GEMINI API (FREE TIER: GEMINI 2.5 FLASH)
 # ---------------------------------------------------------
 def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, periods, chapter_content):
     client = genai.Client(api_key=api_key)
@@ -55,10 +64,10 @@ def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, pe
     Number of Periods: {periods}
     
     --- CHAPTER CONTENT / EXTRACTED TEXT ---
-    {chapter_content[:8000]}  # passing top context
+    {chapter_content[:12000]}
     ---------------------------------------
     
-    Return a strictly valid JSON object with the following keys and detailed, chapter-specific strings/lists:
+    Return a strictly valid JSON object with the following keys:
     {{
       "curriculum_goal": "NCF Curriculum Goal specific to this chapter",
       "relevant_competencies": ["Competency 1", "Competency 2", "Competency 3"],
@@ -109,7 +118,7 @@ def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, pe
     return json.loads(response.text)
 
 # ---------------------------------------------------------
-# WORD DOCUMENT GENERATOR (.DOCX)
+# WORD GENERATOR (.DOCX)
 # ---------------------------------------------------------
 def set_cell_background(cell, fill_color):
     tcPr = cell._tc.get_or_add_tcPr()
@@ -182,8 +191,8 @@ def generate_docx(meta, plan_data):
     add_section_table("Learning Objectives", plan_data.get("learning_objectives", []))
     add_section_table("Expected Learning Outcomes", plan_data.get("expected_learning_outcomes", []))
     
-    if "formulas_and_equations" in plan_data:
-        add_section_table("Key Formulas, Laws &\nChemical Equations", plan_data.get("formulas_and_equations", []))
+    if "formulas_and_equations" in plan_data and plan_data["formulas_and_equations"]:
+        add_section_table("Key Formulas, Laws &\nEquations", plan_data.get("formulas_and_equations", []))
 
     add_section_table("Teaching Methodology", plan_data.get("teaching_methodology", []))
     
@@ -192,7 +201,7 @@ def generate_docx(meta, plan_data):
     add_section_table("Teaching Aids &\nIntegration of Arts", aids_text)
 
     add_section_table("Connecting Previous Knowledge", plan_data.get("previous_knowledge", []))
-    add_section_table("Innovative Techniques\n(Blended/Mind Map)", plan_data.get("innovative_techniques", []))
+    add_section_table("Innovative Techniques", plan_data.get("innovative_techniques", []))
 
     cp_text = ""
     for item in plan_data.get("content_points", []):
@@ -304,12 +313,12 @@ def generate_pdf(meta, plan_data):
         [Paragraph("<b>Expected Learning Outcomes</b>", body_style), Paragraph(make_bullet_list(plan_data.get("expected_learning_outcomes",[])), body_style)],
     ]
 
-    if "formulas_and_equations" in plan_data:
+    if "formulas_and_equations" in plan_data and plan_data["formulas_and_equations"]:
         details_data.append([Paragraph("<b>Key Formulas & Equations</b>", body_style), Paragraph(make_bullet_list(plan_data.get("formulas_and_equations",[])), body_style)])
 
     details_data.extend([
         [Paragraph("<b>Teaching Methodology</b>", body_style), Paragraph(make_bullet_list(plan_data.get("teaching_methodology",[])), body_style)],
-        [Paragraph("<b>Teaching Aids & Integration of Arts</b>", body_style), Paragraph(aids_formatted, body_style)],
+        [Paragraph("<b>Teaching Aids & Art Integration</b>", body_style), Paragraph(aids_formatted, body_style)],
         [Paragraph("<b>Connecting Previous Knowledge</b>", body_style), Paragraph(make_bullet_list(plan_data.get("previous_knowledge",[])), body_style)],
         [Paragraph("<b>Innovative Techniques</b>", body_style), Paragraph(make_bullet_list(plan_data.get("innovative_techniques",[])), body_style)],
         [Paragraph("<b>Content / Teaching Points</b>", body_style), Paragraph(cp_formatted, body_style)],
@@ -345,12 +354,12 @@ def generate_pdf(meta, plan_data):
 # ---------------------------------------------------------
 # UI CONTROLS & SIDEBAR
 # ---------------------------------------------------------
-st.sidebar.header("🔑 AI API Key Settings")
-api_key = st.sidebar.text_input("Gemini API Key", type="password", help="Enter your Gemini API key to enable live chapter analysis.")
-
-st.sidebar.divider()
-st.sidebar.header("Lesson Details")
+st.sidebar.header("📋 Lesson Plan Details")
 teacher_name = st.sidebar.text_input("Teacher Name", "Educator Name")
+
+user_api_key = st.sidebar.text_input("Manual API Key (Optional)", type="password", help="Leave blank. System uses Render environment API key.")
+
+active_api_key = user_api_key.strip() if user_api_key.strip() else system_api_key
 
 subject = st.sidebar.selectbox("Subject", [
     "SCIENCE", "MATHEMATICS", "SOCIAL SCIENCE", "ENGLISH", "HINDI", "SANSKRIT",
@@ -364,7 +373,7 @@ col_g, col_s = st.sidebar.columns(2)
 with col_g:
     grade = st.selectbox("Class", ["VI", "VII", "VIII", "IX", "X", "XI", "XII"])
 with col_s:
-    section = st.text_input("Section", "B")
+    section = st.text_input("Section", "A")
 
 month = st.sidebar.selectbox("Month", ["APRIL", "MAY", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER", "JANUARY", "FEBRUARY"])
 chapter = st.sidebar.text_input("Chapter / Topic", "Force and Laws of Motion")
@@ -373,14 +382,14 @@ periods = st.sidebar.number_input("No. of Periods", min_value=1, max_value=25, v
 # ---------------------------------------------------------
 # MAIN INTERFACE: CHAPTER PDF / TEXT UPLOADER
 # ---------------------------------------------------------
-st.subheader("📂 Step 1: Provide Chapter Content for AI Analysis")
-tab1, tab2 = st.tabs(["📄 Upload Chapter PDF", "📝 Paste Chapter Text/Notes"])
+st.subheader("📂 Step 1: Provide Chapter Content")
+tab1, tab2 = st.tabs(["📄 Upload Chapter PDF (Max 25MB)", "📝 Paste Chapter Text/Notes"])
 
 uploaded_pdf = None
 pasted_text = ""
 
 with tab1:
-    uploaded_pdf = st.file_uploader("Upload NCERT / Textbook Chapter PDF", type=["pdf"])
+    uploaded_pdf = st.file_uploader("Upload NCERT / Textbook Chapter PDF (up to 25 MB)", type=["pdf"])
 
 with tab2:
     pasted_text = st.text_area("Paste text, outline, or key topics from the chapter here:", height=200)
@@ -389,32 +398,36 @@ with tab2:
 # GENERATION ENGINE
 # ---------------------------------------------------------
 st.divider()
-if st.button("✨ Generate AI-Analyzed Lesson Plan", type="primary", use_container_width=True):
-    if not api_key:
-        st.error("⚠️ Please enter your Gemini API Key in the left sidebar to generate AI lesson plans!")
+if st.button("✨ Generate Free AI Lesson Plan & Mind Map", type="primary", use_container_width=True):
+    if not active_api_key:
+        st.error("⚠️ GEMINI_API_KEY environment variable is missing on Render. Please verify you added it under the Environment tab.")
     else:
         chapter_content = ""
         if uploaded_pdf is not None:
-            with st.spinner("Extracting text from uploaded PDF..."):
-                chapter_content = extract_text_from_pdf(uploaded_pdf)
+            if uploaded_pdf.size > 25 * 1024 * 1024:
+                st.error("⚠️ File size exceeds 25 MB. Please upload a single chapter PDF under 25 MB.")
+            else:
+                with st.spinner("Extracting text from uploaded PDF..."):
+                    chapter_content = extract_text_from_pdf(uploaded_pdf)
         elif pasted_text.strip():
             chapter_content = pasted_text.strip()
         else:
             chapter_content = f"Standard NCERT syllabus content for {subject} Class {grade} Chapter: {chapter}."
 
-        with st.spinner("🧠 Analyzing chapter content with AI to create unique lesson plan & mind map..."):
-            try:
-                plan_data = generate_ai_lesson_plan(
-                    api_key, subject, grade, section, chapter, month, periods, chapter_content
-                )
-                st.session_state['plan_data'] = plan_data
-                st.session_state['meta'] = {
-                    'teacher': teacher_name, 'subject': subject, 'grade': grade,
-                    'section': section, 'chapter': chapter, 'periods': periods, 'month': month
-                }
-                st.success("🎉 Unique Chapter-Specific Lesson Plan Generated Successfully!")
-            except Exception as e:
-                st.error(f"Error generating lesson plan: {str(e)}")
+        if uploaded_pdf is None or uploaded_pdf.size <= 25 * 1024 * 1024:
+            with st.spinner("🧠 Analyzing chapter content with Gemini AI..."):
+                try:
+                    plan_data = generate_ai_lesson_plan(
+                        active_api_key, subject, grade, section, chapter, month, periods, chapter_content
+                    )
+                    st.session_state['plan_data'] = plan_data
+                    st.session_state['meta'] = {
+                        'teacher': teacher_name, 'subject': subject, 'grade': grade,
+                        'section': section, 'chapter': chapter, 'periods': periods, 'month': month
+                    }
+                    st.success("🎉 Lesson Plan Generated Successfully!")
+                except Exception as e:
+                    st.error(f"Error generating lesson plan: {str(e)}")
 
 # ---------------------------------------------------------
 # DISPLAY & DOWNLOADS
@@ -439,17 +452,16 @@ if 'plan_data' in st.session_state:
 
     if "formulas_and_equations" in data and data["formulas_and_equations"]:
         st.divider()
-        st.subheader("📐 Key Formulas, Laws & Equations (Extracted from Chapter)")
+        st.subheader("📐 Key Formulas & Laws Extracted")
         for f in data["formulas_and_equations"]:
             st.info(f"⚡ {f}")
 
     # Visual Mind Map
     st.divider()
-    st.subheader(f"🧠 AI-Generated Visual Mind Map: {meta['chapter']}")
+    st.subheader(f"🧠 Visual Mind Map: {meta['chapter']}")
 
     dot = graphviz.Digraph(comment=meta['chapter'])
     dot.attr(rankdir='LR', size='8,5', node_style='filled', fillcolor='#EBF8FF', color='#2B6CB0', fontname='Helvetica')
-
     dot.node('CENTER', meta['chapter'], shape='box', fillcolor='#2B6CB0', fontcolor='white')
 
     subtopic_idx = 0
@@ -475,7 +487,7 @@ if 'plan_data' in st.session_state:
     with col_pdf:
         pdf_file = generate_pdf(meta, data)
         st.download_button(
-            label="📄 Download Official Lesson Plan (PDF)",
+            label="📄 Download Official PDF",
             data=pdf_file,
             file_name=f"ABPS_Lesson_Plan_{meta['grade']}_{meta['chapter'].replace(' ', '_')}.pdf",
             mime="application/pdf",
@@ -485,7 +497,7 @@ if 'plan_data' in st.session_state:
     with col_docx:
         docx_file = generate_docx(meta, data)
         st.download_button(
-            label="📝 Download Editable Lesson Plan (Word .docx)",
+            label="📝 Download Editable Word Document (.docx)",
             data=docx_file,
             file_name=f"ABPS_Lesson_Plan_{meta['grade']}_{meta['chapter'].replace(' ', '_')}.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
