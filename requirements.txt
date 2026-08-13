@@ -1,4 +1,6 @@
 streamlit
-reportlab
 python-docx
+reportlab
 graphviz
+google-genai
+pypdf
