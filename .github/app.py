@@ -76,9 +76,7 @@ st.markdown("""
         letter-spacing: -0.02em;
     }
 
-    /* =========================================================
-       SIDEBAR & DROPDOWN CONTRAST FIX
-       ========================================================= */
+    /* SIDEBAR & DROPDOWN CONTRAST FIX */
     [data-testid="stSidebar"] {
         background: #0f172a !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
@@ -113,10 +111,7 @@ st.markdown("""
         background-color: #334155 !important;
     }
 
-    /* =========================================================
-       FROSTED GLASS CARDS & TABS
-       ========================================================= */
-    /* Tab Container */
+    /* FROSTED GLASS CARDS & TABS */
     [data-testid="stTabs"] {
         background: rgba(255, 255, 255, 0.75) !important;
         backdrop-filter: blur(20px) !important;
@@ -127,7 +122,6 @@ st.markdown("""
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03) !important;
     }
 
-    /* Customizing Tab Pills */
     button[data-baseweb="tab"] {
         background: transparent !important;
         border-radius: 10px !important;
@@ -142,7 +136,6 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
     }
 
-    /* Input text areas and file uploader */
     .stTextArea textarea, .stFileUploader {
         background: rgba(255, 255, 255, 0.85) !important;
         border: 1px solid #e2e8f0 !important;
@@ -150,10 +143,7 @@ st.markdown("""
         color: #0f172a !important;
     }
 
-    /* =========================================================
-       HIGH-INTERACTION BUTTONS
-       ========================================================= */
-    /* Secondary/Glass Buttons */
+    /* BUTTONS */
     div.stButton > button {
         background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,244,255,0.8) 100%) !important;
         backdrop-filter: blur(10px) !important;
@@ -173,7 +163,6 @@ st.markdown("""
         color: #4f46e5 !important;
     }
 
-    /* Primary Action Button (Generate Plan) */
     div.stButton > button[kind="primary"] {
         background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%) !important;
         color: #ffffff !important;
@@ -187,7 +176,6 @@ st.markdown("""
         box-shadow: 0 12px 30px -5px rgba(37, 99, 235, 0.6) !important;
     }
 
-    /* Download Buttons */
     div[data-testid="stDownloadButton"] > button {
         background: rgba(16, 185, 129, 0.1) !important;
         border: 1px solid rgba(16, 185, 129, 0.4) !important;
@@ -207,11 +195,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# VALID GEMINI MODELS
+# VALID GEMINI MODELS (UPDATED)
 # ---------------------------------------------------------
 CANDIDATE_MODELS = [
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
 ]
 
 # ---------------------------------------------------------
