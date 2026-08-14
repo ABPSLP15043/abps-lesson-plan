@@ -149,7 +149,6 @@ def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, pe
     Do not add markdown backticks like ```json. Return raw JSON string only.
     """
 
-    # Automatic fallback array to guarantee execution regardless of endpoint model updates
     candidate_models = [
         'gemini-2.5-flash',
         'gemini-2.0-flash',
@@ -513,4 +512,12 @@ if 'plan_data' in st.session_state:
         )
         
     with col_docx:
-        docx_file = generate_docx(meta,
+        docx_file = generate_docx(meta, data)
+        st.download_button(
+            label="📝 Download Editable Word Document (.docx)",
+            data=docx_file,
+            file_name=f"ABPS_Lesson_Plan_{meta['grade']}_{meta['chapter'].replace(' ', '_')}.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            type="primary",
+            use_container_width=True
+        )
