@@ -1,12 +1,13 @@
-import streamlit as st
-import os
 import io
 import json
+import os
+from xml.sax.saxutils import escape as xml_escape
+
+import streamlit as st
 import docx
 import graphviz
 from pypdf import PdfReader
 from google import genai
-from google.genai import types
 
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -14,44 +15,118 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
-# PAGE CONFIGURATION
+# MODELS  (current as of the Gemini Interactions API)
+# ---------------------------------------------------------
+CANDIDATE_MODELS = [
+    "gemini-3.7-flash",
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+    "gemini-3.5-flash-lite",
+]
+
+# ---------------------------------------------------------
+# JSON SCHEMA FOR THE LESSON PLAN
+# ---------------------------------------------------------
+_STR_LIST = {"type": "array", "items": {"type": "string"}}
+
+LESSON_PLAN_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "curriculum_goal": {"type": "string", "description": "NCF-SE 2023 curriculum goal for this chapter."},
+        "relevant_competencies": _STR_LIST,
+        "learning_objectives": _STR_LIST,
+        "expected_learning_outcomes": _STR_LIST,
+        "formulas_and_equations": _STR_LIST,
+        "teaching_methodology": _STR_LIST,
+        "teaching_aids": _STR_LIST,
+        "art_integration": _STR_LIST,
+        "previous_knowledge": _STR_LIST,
+        "innovative_techniques": _STR_LIST,
+        "content_points": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"section": {"type": "string"}, "topics": _STR_LIST},
+                "required": ["section", "topics"],
+            },
+        },
+        "projects_experiential": _STR_LIST,
+        "skills_acquired": _STR_LIST,
+        "values_inculcated": _STR_LIST,
+        "multiple_assessment": {
+            "type": "object",
+            "properties": {
+                "oral_questions": _STR_LIST,
+                "worksheet": _STR_LIST,
+                "practical": _STR_LIST,
+                "exit_ticket": _STR_LIST,
+            },
+            "required": ["oral_questions", "worksheet", "practical", "exit_ticket"],
+        },
+        "class_work": _STR_LIST,
+        "home_work": _STR_LIST,
+        "remedial_measures": {
+            "type": "object",
+            "properties": {"slow_learners": _STR_LIST, "advanced_learners": _STR_LIST},
+            "required": ["slow_learners", "advanced_learners"],
+        },
+        "resources": {
+            "type": "object",
+            "properties": {"books": _STR_LIST, "websites": _STR_LIST, "videos": _STR_LIST},
+            "required": ["books", "websites", "videos"],
+        },
+    },
+    "required": [
+        "curriculum_goal", "relevant_competencies", "learning_objectives",
+        "expected_learning_outcomes", "teaching_methodology", "teaching_aids",
+        "art_integration", "previous_knowledge", "innovative_techniques",
+        "content_points", "projects_experiential", "skills_acquired",
+        "values_inculcated", "multiple_assessment", "class_work", "home_work",
+        "remedial_measures", "resources",
+    ],
+}
+
+# ---------------------------------------------------------
+# PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
     page_title="ABPS Baikunth - AI Lesson Plan Generator",
     page_icon="🏫",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
-# Main Title & Subheading
 st.title("🏫 The Aditya Birla Public School, Baikunth")
-st.caption("Free AI-Powered NCF-SE 2023 Lesson Plan & Mind Map Generator")
+st.caption("AI-Powered NCF-SE 2023 Lesson Plan & Mind Map Generator")
 
-# Retrieve API Key
 system_api_key = os.getenv("GEMINI_API_KEY", "")
 
 # ---------------------------------------------------------
-# SIDEBAR CONTROLS (METADATA INPUTS)
+# SIDEBAR
 # ---------------------------------------------------------
 st.sidebar.header("📋 Lesson Plan Details")
 
 teacher_name = st.sidebar.text_input("Teacher Name", "Educator Name")
 
-user_api_key = st.sidebar.text_input("Manual API Key (Optional)", type="password", help="Leave blank if API key is set in environment.")
+user_api_key = st.sidebar.text_input(
+    "Manual API Key (Optional)", type="password",
+    help="Leave blank if GEMINI_API_KEY is set in your environment.",
+)
 active_api_key = user_api_key.strip() if user_api_key.strip() else system_api_key
 
 subject = st.sidebar.selectbox("Subject", [
     "SCIENCE", "MATHEMATICS", "SOCIAL SCIENCE", "ENGLISH", "HINDI", "SANSKRIT",
     "MUSIC", "ART & CRAFT", "DANCE",
     "PHYSICS", "CHEMISTRY", "BIOLOGY", "COMPUTER SCIENCE", "IP",
-    "ACCOUNTANCY", "BUSINESS STUDIES", "ECONOMICS", "HISTORY", "POLITICAL SCIENCE", "GEOGRAPHY",
-    "ARTIFICIAL INTELLIGENCE (AI)", "INFORMATION TECHNOLOGY (IT)"
+    "ACCOUNTANCY", "BUSINESS STUDIES", "ECONOMICS", "HISTORY",
+    "POLITICAL SCIENCE", "GEOGRAPHY",
+    "ARTIFICIAL INTELLIGENCE (AI)", "INFORMATION TECHNOLOGY (IT)",
 ])
 
 col_g, col_s = st.sidebar.columns(2)
@@ -60,12 +135,36 @@ with col_g:
 with col_s:
     section = st.text_input("Section", "A")
 
-month = st.sidebar.selectbox("Month", ["APRIL", "MAY", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER", "JANUARY", "FEBRUARY"])
+month = st.sidebar.selectbox("Month", [
+    "APRIL", "MAY", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER",
+    "NOVEMBER", "DECEMBER", "JANUARY", "FEBRUARY",
+])
 chapter = st.sidebar.text_input("Chapter / Topic", "Force and Laws of Motion")
 periods = st.sidebar.number_input("No. of Periods", min_value=1, max_value=25, value=8)
 
+st.sidebar.divider()
+
+# Diagnostic: ask the API what models this key can actually use.
+if st.sidebar.button("🔍 Check available models"):
+    if not active_api_key:
+        st.sidebar.error("Enter an API key first.")
+    else:
+        try:
+            diag_client = genai.Client(api_key=active_api_key)
+            names = []
+            for m in diag_client.models.list():
+                raw = getattr(m, "name", str(m))
+                names.append(raw.replace("models/", ""))
+            if names:
+                st.sidebar.success(f"{len(names)} models available:")
+                st.sidebar.code("\n".join(sorted(names)))
+            else:
+                st.sidebar.warning("No models returned for this key.")
+        except Exception as exc:
+            st.sidebar.error(f"Could not list models: {exc}")
+
 # ---------------------------------------------------------
-# MAIN INTERFACE: CHAPTER UPLOAD (PDF / TEXT)
+# CHAPTER INPUT
 # ---------------------------------------------------------
 st.subheader("📂 Step 1: Provide Chapter Content")
 tab1, tab2 = st.tabs(["📄 Upload Chapter PDF (Max 25MB)", "📝 Paste Chapter Text/Notes"])
@@ -74,450 +173,514 @@ uploaded_pdf = None
 pasted_text = ""
 
 with tab1:
-    uploaded_pdf = st.file_uploader("Upload NCERT / Textbook Chapter PDF (up to 25 MB)", type=["pdf"])
+    uploaded_pdf = st.file_uploader(
+        "Upload NCERT / Textbook Chapter PDF (up to 25 MB)", type=["pdf"]
+    )
 
 with tab2:
-    pasted_text = st.text_area("Paste text, outline, or key topics from the chapter here:", height=200)
+    pasted_text = st.text_area(
+        "Paste text, outline, or key topics from the chapter here:", height=200
+    )
+
 
 # ---------------------------------------------------------
-# HELPER FUNCTIONS
+# HELPERS
 # ---------------------------------------------------------
 def extract_text_from_pdf(uploaded_file, max_pages=40):
     reader = PdfReader(uploaded_file)
-    extracted_text = ""
-    total_pages = min(len(reader.pages), max_pages)
-    for i in range(total_pages):
-        text = reader.pages[i].extract_text()
+    parts = []
+    for page in reader.pages[:max_pages]:
+        text = page.extract_text()
         if text:
-            extracted_text += text + "\n"
-    return extracted_text
+            parts.append(text)
+    return "\n".join(parts)
 
-def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, periods, chapter_content):
+
+def strip_code_fences(text):
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[-1] if "\n" in text else text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    return text.strip()
+
+
+def build_prompt(subject, grade, section, chapter, month, periods, chapter_content):
+    return (
+        "You are an expert curriculum designer for Indian schools following the "
+        "NCF-SE 2023 and NEP 2020 guidelines for NCERT textbooks.\n\n"
+        "Using the chapter content supplied below, produce a HIGHLY SPECIFIC, UNIQUE and "
+        "ACCURATE lesson plan. Every item must refer to the actual content of this chapter, "
+        "never generic placeholders. Include real formulas, laws, definitions, dates or "
+        "terms wherever the subject calls for them.\n\n"
+        f"Subject: {subject}\n"
+        f"Class / Section: {grade} - {section}\n"
+        f"Chapter: {chapter}\n"
+        f"Month: {month}\n"
+        f"Number of periods: {periods}\n\n"
+        "--- CHAPTER CONTENT ---\n"
+        f"{chapter_content[:12000]}\n"
+        "--- END CHAPTER CONTENT ---\n\n"
+        "Give 6 to 10 items in each list where the chapter supports it. "
+        "Give at least 4 sections in content_points, each with 3 or more topics. "
+        "If the chapter has no formulas or equations, return an empty list for that field."
+    )
+
+
+def call_model(client, model_name, prompt):
+    """Works with google-genai 2.x (Interactions API) and falls back to 1.x."""
+    if hasattr(client, "interactions"):
+        interaction = client.interactions.create(
+            model=model_name,
+            input=prompt,
+            response_format={
+                "type": "text",
+                "mime_type": "application/json",
+                "schema": LESSON_PLAN_SCHEMA,
+            },
+        )
+        return interaction.output_text
+
+    # Legacy SDK path (google-genai 1.x)
+    from google.genai import types
+    response = client.models.generate_content(
+        model=model_name,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=LESSON_PLAN_SCHEMA,
+        ),
+    )
+    return response.text
+
+
+def generate_ai_lesson_plan(api_key, subject, grade, section, chapter,
+                            month, periods, chapter_content):
     client = genai.Client(api_key=api_key)
-    
-    prompt = f"""
-    You are an expert curriculum designer for Indian schools following NCF-SE 2023 and NEP 2020 guidelines for NCERT books.
-    Analyze the following details and provided chapter content/text to create a HIGHLY SPECIFIC, UNIQUE, and ACCURATE lesson plan.
-    
-    Subject: {subject}
-    Grade/Class: {grade} - {section}
-    Chapter Name: {chapter}
-    Month: {month}
-    Number of Periods: {periods}
-    
-    --- CHAPTER CONTENT / EXTRACTED TEXT ---
-    {chapter_content[:12000]}
-    ---------------------------------------
-    
-    Return a strictly valid JSON object with the following keys:
-    {{
-      "curriculum_goal": "NCF Curriculum Goal specific to this chapter",
-      "relevant_competencies": ["Competency 1", "Competency 2", "Competency 3"],
-      "learning_objectives": ["Objective 1 specific to content", "Objective 2", "Objective 3"],
-      "expected_learning_outcomes": ["Outcome 1", "Outcome 2", "Outcome 3"],
-      "formulas_and_equations": ["Specific formula/law/definition 1 from chapter", "Formula/law 2"],
-      "teaching_methodology": ["Method 1", "Method 2"],
-      "teaching_aids": ["Aid 1", "Aid 2"],
-      "art_integration": ["Art integration task specific to chapter"],
-      "previous_knowledge": ["Prerequisite 1", "Prerequisite 2"],
-      "innovative_techniques": ["Technique 1", "Technique 2"],
-      "content_points": [
-        {{"section": "Section 1 Title", "topics": ["Subtopic A", "Subtopic B"]}},
-        {{"section": "Section 2 Title", "topics": ["Subtopic C", "Subtopic D"]}}
-      ],
-      "projects_experiential": ["Experiential activity for this chapter"],
-      "skills_acquired": ["Skill 1", "Skill 2"],
-      "values_inculcated": ["Value 1", "Value 2"],
-      "multiple_assessment": {{
-        "oral_questions": ["Chapter Question 1", "Chapter Question 2"],
-        "worksheet": ["Task 1", "Task 2"],
-        "practical": ["Practical task / activity"],
-        "exit_ticket": ["Exit ticket prompt"]
-      }},
-      "class_work": ["Classwork task 1", "Classwork task 2"],
-      "home_work": ["Homework task 1", "Homework task 2"],
-      "remedial_measures": {{
-        "slow_learners": ["Support strategy 1"],
-        "advanced_learners": ["Enrichment task 1"]
-      }},
-      "resources": {{
-        "books": ["NCERT Class {grade} {subject}"],
-        "websites": ["DIKSHA Portal"],
-        "videos": ["Relevant topic educational video"]
-      }}
-    }}
-    Do not add markdown backticks like ```json. Return raw JSON string only.
-    """
+    prompt = build_prompt(subject, grade, section, chapter, month, periods, chapter_content)
 
-    # Updated active models supported by google-genai
-    candidate_models = [
-        'gemini-2.5-flash',
-        'gemini-2.0-flash',
-        'gemini-2.5-pro'
-    ]
-
-    last_exception = None
-    for model_name in candidate_models:
+    failures = []
+    for model_name in CANDIDATE_MODELS:
         try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json"
-                )
-            )
-            raw_text = response.text.strip()
-            if raw_text.startswith("```json"):
-                raw_text = raw_text[7:]
-            if raw_text.endswith("```"):
-                raw_text = raw_text[:-3]
-            return json.loads(raw_text.strip())
-        except Exception as e:
-            last_exception = e
-            continue
+            raw = call_model(client, model_name, prompt)
+            return json.loads(strip_code_fences(raw)), model_name
+        except Exception as exc:
+            failures.append(f"• {model_name} → {exc}")
 
-    raise last_exception
+    raise RuntimeError(
+        "Every candidate model failed.\n\n"
+        + "\n".join(failures)
+        + "\n\nClick 'Check available models' in the sidebar to see what your "
+          "API key can actually use, then update CANDIDATE_MODELS at the top of app.py."
+    )
 
-# Word Document Generator
+
+# ---------------------------------------------------------
+# WORD EXPORT
+# ---------------------------------------------------------
 def set_cell_background(cell, fill_color):
-    tcPr = cell._tc.get_or_add_tcPr()
-    shd = OxmlElement('w:shd')
-    shd.set(qn('w:val'), 'clear')
-    shd.set(qn('w:color'), 'auto')
-    shd.set(qn('w:fill'), fill_color)
-    tcPr.append(shd)
+    tc_pr = cell._tc.get_or_add_tcPr()
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:val"), "clear")
+    shd.set(qn("w:color"), "auto")
+    shd.set(qn("w:fill"), fill_color)
+    tc_pr.append(shd)
 
-def generate_docx(meta, plan_data):
+
+def bullets(items):
+    if isinstance(items, list):
+        return "\n".join(f"• {i}" for i in items)
+    return str(items)
+
+
+def generate_docx(meta, plan):
     doc = docx.Document()
-    for s in doc.sections:
-        s.top_margin = Inches(0.5)
-        s.bottom_margin = Inches(0.5)
-        s.left_margin = Inches(0.6)
-        s.right_margin = Inches(0.6)
+    for sec in doc.sections:
+        sec.top_margin = Inches(0.5)
+        sec.bottom_margin = Inches(0.5)
+        sec.left_margin = Inches(0.6)
+        sec.right_margin = Inches(0.6)
 
-    p_title = doc.add_paragraph()
-    p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_t1 = p_title.add_run("THE ADITYA BIRLA PUBLIC SCHOOL\n")
-    run_t1.bold = True
-    run_t1.font.size = Pt(14)
-    run_t1.font.color.rgb = RGBColor(0x1A, 0x36, 0x5D)
+    title_p = doc.add_paragraph()
+    title_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run1 = title_p.add_run("THE ADITYA BIRLA PUBLIC SCHOOL\n")
+    run1.bold = True
+    run1.font.size = Pt(14)
+    run1.font.color.rgb = RGBColor(0x1A, 0x36, 0x5D)
+    run2 = title_p.add_run(
+        "BAIKUNTH, TAH- TILDA, DIST. RAIPUR (C.G.) – 493116\nLesson Plan\n"
+    )
+    run2.font.size = Pt(10)
+    run2.bold = True
 
-    run_t2 = p_title.add_run("BAIKUNTH, TAH- TILDA, DIST. RAIPUR (C.G.) – 493116\nLesson Plan\n")
-    run_t2.font.size = Pt(10)
-    run_t2.bold = True
-
-    info_table = doc.add_table(rows=3, cols=2)
-    info_table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    info_table.style = 'Table Grid'
-    
+    info = doc.add_table(rows=3, cols=2)
+    info.alignment = WD_TABLE_ALIGNMENT.CENTER
+    info.style = "Table Grid"
     rows_data = [
         [f"Name of the Chapter: {meta['chapter']}", f"Subject: {meta['subject']}"],
         [f"Class: {meta['grade']} {meta['section']}", f"Month: {meta['month']}"],
-        [f"Teacher: {meta['teacher']}", f"No. of Periods: {meta['periods']}"]
+        [f"Teacher: {meta['teacher']}", f"No. of Periods: {meta['periods']}"],
     ]
-    
-    for r_idx, r in enumerate(rows_data):
-        for c_idx, val in enumerate(r):
-            cell = info_table.cell(r_idx, c_idx)
+    for r_idx, row in enumerate(rows_data):
+        for c_idx, val in enumerate(row):
+            cell = info.cell(r_idx, c_idx)
             cell.text = val
             set_cell_background(cell, "F7FAFC")
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-    def add_section_table(title, content):
-        t = doc.add_table(rows=1, cols=2)
-        t.alignment = WD_TABLE_ALIGNMENT.CENTER
-        t.style = 'Table Grid'
-        
-        c0 = t.cell(0, 0)
-        c0.width = Inches(2.2)
-        c0.paragraphs[0].add_run(title).bold = True
-        set_cell_background(c0, "EDF2F7")
-        
-        c1 = t.cell(0, 1)
-        c1.width = Inches(4.8)
-        
+    def add_section(title, content):
+        table = doc.add_table(rows=1, cols=2)
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
+        table.style = "Table Grid"
+
+        left = table.cell(0, 0)
+        left.width = Inches(2.2)
+        left.paragraphs[0].add_run(title).bold = True
+        set_cell_background(left, "EDF2F7")
+
+        right = table.cell(0, 1)
+        right.width = Inches(4.8)
         if isinstance(content, list):
+            right.paragraphs[0].text = ""
             for item in content:
-                c1.add_paragraph(f"• {item}")
+                right.add_paragraph(f"• {item}")
         else:
-            c1.paragraphs[0].text = str(content)
-            
+            right.paragraphs[0].text = str(content)
+
         doc.add_paragraph().paragraph_format.space_after = Pt(4)
 
-    add_section_table("Curriculum Goal (NCF-SE 2023)", plan_data.get("curriculum_goal", ""))
-    add_section_table("Relevant Competencies", plan_data.get("relevant_competencies", []))
-    add_section_table("Learning Objectives", plan_data.get("learning_objectives", []))
-    add_section_table("Expected Learning Outcomes", plan_data.get("expected_learning_outcomes", []))
-    
-    if "formulas_and_equations" in plan_data and plan_data["formulas_and_equations"]:
-        add_section_table("Key Formulas, Laws &\nEquations", plan_data.get("formulas_and_equations", []))
+    add_section("Curriculum Goal (NCF-SE 2023)", plan.get("curriculum_goal", ""))
+    add_section("Relevant Competencies", plan.get("relevant_competencies", []))
+    add_section("Learning Objectives", plan.get("learning_objectives", []))
+    add_section("Expected Learning Outcomes", plan.get("expected_learning_outcomes", []))
 
-    add_section_table("Teaching Methodology", plan_data.get("teaching_methodology", []))
-    
-    aids_text = "Teaching Aids:\n" + "\n".join([f"• {a}" for a in plan_data.get("teaching_aids", [])])
-    aids_text += "\n\nArt Integration:\n" + "\n".join([f"• {a}" for a in plan_data.get("art_integration", [])])
-    add_section_table("Teaching Aids &\nIntegration of Arts", aids_text)
+    if plan.get("formulas_and_equations"):
+        add_section("Key Formulas, Laws & Equations", plan["formulas_and_equations"])
 
-    add_section_table("Connecting Previous Knowledge", plan_data.get("previous_knowledge", []))
-    add_section_table("Innovative Techniques", plan_data.get("innovative_techniques", []))
+    add_section("Teaching Methodology", plan.get("teaching_methodology", []))
 
-    cp_text = ""
-    for item in plan_data.get("content_points", []):
-        cp_text += f"{item.get('section','')}:\n"
-        for t in item.get("topics", []):
-            cp_text += f"  • {t}\n"
-    add_section_table("Content / Teaching Points", cp_text.strip())
+    aids = ("Teaching Aids:\n" + bullets(plan.get("teaching_aids", []))
+            + "\n\nArt Integration:\n" + bullets(plan.get("art_integration", [])))
+    add_section("Teaching Aids & Integration of Arts", aids)
 
-    add_section_table("Project / Experiential Learning", plan_data.get("projects_experiential", []))
-    add_section_table("Skills Acquired", plan_data.get("skills_acquired", []))
-    add_section_table("Values Inculcated", plan_data.get("values_inculcated", []))
+    add_section("Connecting Previous Knowledge", plan.get("previous_knowledge", []))
+    add_section("Innovative Techniques", plan.get("innovative_techniques", []))
 
-    ass = plan_data.get("multiple_assessment", {})
-    ass_text = "Oral Questions:\n" + "\n".join([f"• {q}" for q in ass.get("oral_questions", [])])
-    ass_text += "\n\nWorksheet:\n" + "\n".join([f"• {w}" for w in ass.get("worksheet", [])])
-    ass_text += "\n\nPractical Assessment:\n" + "\n".join([f"• {p}" for p in ass.get("practical", [])])
-    ass_text += "\n\nExit Ticket:\n" + "\n".join([f"• {e}" for e in ass.get("exit_ticket", [])])
-    add_section_table("Multiple / Periodic Assessment", ass_text)
+    cp_lines = []
+    for item in plan.get("content_points", []):
+        cp_lines.append(f"{item.get('section', '')}:")
+        for topic in item.get("topics", []):
+            cp_lines.append(f"   • {topic}")
+    add_section("Content / Teaching Points", "\n".join(cp_lines))
 
-    add_section_table("Class Work", plan_data.get("class_work", []))
-    add_section_table("Home Work", plan_data.get("home_work", []))
+    add_section("Project / Experiential Learning", plan.get("projects_experiential", []))
+    add_section("Skills Acquired", plan.get("skills_acquired", []))
+    add_section("Values Inculcated", plan.get("values_inculcated", []))
 
-    rem = plan_data.get("remedial_measures", {})
-    rem_text = "Slow Learners:\n" + "\n".join([f"• {s}" for s in rem.get("slow_learners", [])])
-    rem_text += "\n\nAdvanced Learners:\n" + "\n".join([f"• {a}" for a in rem.get("advanced_learners", [])])
-    add_section_table("Remedial Measures", rem_text)
+    ass = plan.get("multiple_assessment", {})
+    ass_text = (
+        "Oral Questions:\n" + bullets(ass.get("oral_questions", []))
+        + "\n\nWorksheet:\n" + bullets(ass.get("worksheet", []))
+        + "\n\nPractical Assessment:\n" + bullets(ass.get("practical", []))
+        + "\n\nExit Ticket:\n" + bullets(ass.get("exit_ticket", []))
+    )
+    add_section("Multiple / Periodic Assessment", ass_text)
 
-    res = plan_data.get("resources", {})
-    res_text = "Books:\n" + "\n".join([f"• {b}" for b in res.get("books", [])])
-    res_text += "\n\nWebsites:\n" + "\n".join([f"• {w}" for w in res.get("websites", [])])
-    res_text += "\n\nVideos:\n" + "\n".join([f"• {v}" for v in res.get("videos", [])])
-    add_section_table("Resources & References", res_text)
+    add_section("Class Work", plan.get("class_work", []))
+    add_section("Home Work", plan.get("home_work", []))
+
+    rem = plan.get("remedial_measures", {})
+    rem_text = ("Slow Learners:\n" + bullets(rem.get("slow_learners", []))
+                + "\n\nAdvanced Learners:\n" + bullets(rem.get("advanced_learners", [])))
+    add_section("Remedial Measures", rem_text)
+
+    res = plan.get("resources", {})
+    res_text = ("Books:\n" + bullets(res.get("books", []))
+                + "\n\nWebsites:\n" + bullets(res.get("websites", []))
+                + "\n\nVideos:\n" + bullets(res.get("videos", [])))
+    add_section("Resources & References", res_text)
 
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
-    sig_table = doc.add_table(rows=1, cols=3)
-    sig_table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    sig_table.cell(0, 0).text = "___________________\nSubject Teacher"
-    sig_table.cell(0, 1).text = "___________________\nHOD"
-    sig_table.cell(0, 2).text = "___________________\nPrincipal"
+    sig = doc.add_table(rows=1, cols=3)
+    sig.alignment = WD_TABLE_ALIGNMENT.CENTER
+    sig.cell(0, 0).text = "___________________\nSubject Teacher"
+    sig.cell(0, 1).text = "___________________\nHOD"
+    sig.cell(0, 2).text = "___________________\nPrincipal"
 
     buffer = io.BytesIO()
     doc.save(buffer)
     buffer.seek(0)
     return buffer
 
-# PDF Generator
-def generate_pdf(meta, plan_data):
+
+# ---------------------------------------------------------
+# PDF EXPORT
+# ---------------------------------------------------------
+def esc(text):
+    """Escape &, < and > so ReportLab never crashes on chapter text."""
+    return xml_escape(str(text))
+
+
+def html_bullets(items):
+    if isinstance(items, list):
+        return "<br/>".join(f"• {esc(i)}" for i in items)
+    return esc(items)
+
+
+def generate_pdf(meta, plan):
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+    doc = SimpleDocTemplate(
+        buffer, pagesize=A4,
+        rightMargin=28, leftMargin=28, topMargin=28, bottomMargin=28,
+    )
     story = []
-    
+
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle(
-        'TitleStyle', parent=styles['Heading1'], fontName='Helvetica-Bold',
-        fontSize=12, alignment=1, textColor=colors.HexColor('#1A365D')
+        "TitleStyle", parent=styles["Heading1"], fontName="Helvetica-Bold",
+        fontSize=13, alignment=1, textColor=colors.HexColor("#1A365D"),
     )
-    body_style = ParagraphStyle(
-        'BodyStyle', parent=styles['Normal'], fontName='Helvetica', fontSize=8, leading=11
+    sub_style = ParagraphStyle(
+        "SubStyle", parent=styles["Normal"], fontName="Helvetica",
+        fontSize=8.5, alignment=1,
+    )
+    body = ParagraphStyle(
+        "BodyStyle", parent=styles["Normal"], fontName="Helvetica",
+        fontSize=8, leading=11,
     )
 
-    story.append(Paragraph("<b>THE ADITYA BIRLA PUBLIC SCHOOL</b>", title_style))
-    story.append(Paragraph("BAIKUNTH, TAH- TILDA, DIST. RAIPUR (C.G.) – 493116<br/><b>Lesson Plan</b>", ParagraphStyle('Sub', parent=title_style, fontSize=8, fontName='Helvetica')))
+    story.append(Paragraph("THE ADITYA BIRLA PUBLIC SCHOOL", title_style))
+    story.append(Paragraph(
+        "BAIKUNTH, TAH- TILDA, DIST. RAIPUR (C.G.) – 493116<br/><b>Lesson Plan</b>",
+        sub_style,
+    ))
     story.append(Spacer(1, 8))
 
     info_data = [
-        [Paragraph(f"<b>Name of the Chapter:</b> {meta['chapter']}", body_style), Paragraph(f"<b>Subject:</b> {meta['subject']}", body_style)],
-        [Paragraph(f"<b>Class:</b> {meta['grade']} {meta['section']}", body_style), Paragraph(f"<b>Month:</b> {meta['month']}", body_style)],
-        [Paragraph(f"<b>Teacher:</b> {meta['teacher']}", body_style), Paragraph(f"<b>No. of Periods:</b> {meta['periods']}", body_style)]
+        [Paragraph(f"<b>Chapter:</b> {esc(meta['chapter'])}", body),
+         Paragraph(f"<b>Subject:</b> {esc(meta['subject'])}", body)],
+        [Paragraph(f"<b>Class:</b> {esc(meta['grade'])} {esc(meta['section'])}", body),
+         Paragraph(f"<b>Month:</b> {esc(meta['month'])}", body)],
+        [Paragraph(f"<b>Teacher:</b> {esc(meta['teacher'])}", body),
+         Paragraph(f"<b>No. of Periods:</b> {esc(meta['periods'])}", body)],
     ]
-    info_table = Table(info_data, colWidths=[270, 270])
+    info_table = Table(info_data, colWidths=[260, 260])
     info_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#F7FAFC')),
-        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#CBD5E0')),
-        ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor('#E2E8F0')),
-        ('PADDING', (0,0), (-1,-1), 4),
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F7FAFC")),
+        ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#CBD5E0")),
+        ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
     story.append(info_table)
     story.append(Spacer(1, 6))
 
-    def make_bullet_list(items):
-        return "<br/>".join([f"• {i}" for i in items]) if isinstance(items, list) else str(items)
+    cp_html = ""
+    for item in plan.get("content_points", []):
+        cp_html += f"<b>{esc(item.get('section', ''))}</b><br/>"
+        for topic in item.get("topics", []):
+            cp_html += f"• {esc(topic)}<br/>"
 
-    cp_formatted = ""
-    for item in plan_data.get("content_points", []):
-        cp_formatted += f"<b>{item.get('section','')}</b><br/>"
-        for t in item.get("topics", []):
-            cp_formatted += f"• {t}<br/>"
+    ass = plan.get("multiple_assessment", {})
+    ass_html = (
+        f"<b>Oral Questions:</b><br/>{html_bullets(ass.get('oral_questions', []))}<br/><br/>"
+        f"<b>Worksheet:</b><br/>{html_bullets(ass.get('worksheet', []))}<br/><br/>"
+        f"<b>Practical:</b><br/>{html_bullets(ass.get('practical', []))}<br/><br/>"
+        f"<b>Exit Ticket:</b><br/>{html_bullets(ass.get('exit_ticket', []))}"
+    )
 
-    ass = plan_data.get("multiple_assessment", {})
-    ass_formatted = f"<b>Oral Questions:</b><br/>{make_bullet_list(ass.get('oral_questions',[]))}<br/><br/>"
-    ass_formatted += f"<b>Worksheet:</b><br/>{make_bullet_list(ass.get('worksheet',[]))}<br/><br/>"
-    ass_formatted += f"<b>Practical Assessment:</b><br/>{make_bullet_list(ass.get('practical',[]))}<br/><br/>"
-    ass_formatted += f"<b>Exit Ticket:</b><br/>{make_bullet_list(ass.get('exit_ticket',[]))}"
+    rem = plan.get("remedial_measures", {})
+    rem_html = (
+        f"<b>Slow Learners:</b><br/>{html_bullets(rem.get('slow_learners', []))}<br/><br/>"
+        f"<b>Advanced Learners:</b><br/>{html_bullets(rem.get('advanced_learners', []))}"
+    )
 
-    rem = plan_data.get("remedial_measures", {})
-    rem_formatted = f"<b>Slow Learners:</b><br/>{make_bullet_list(rem.get('slow_learners',[]))}<br/><br/><b>Advanced Learners:</b><br/>{make_bullet_list(rem.get('advanced_learners',[]))}"
+    res = plan.get("resources", {})
+    res_html = (
+        f"<b>Books:</b><br/>{html_bullets(res.get('books', []))}<br/><br/>"
+        f"<b>Websites:</b><br/>{html_bullets(res.get('websites', []))}<br/><br/>"
+        f"<b>Videos:</b><br/>{html_bullets(res.get('videos', []))}"
+    )
 
-    res = plan_data.get("resources", {})
-    res_formatted = f"<b>Books:</b><br/>{make_bullet_list(res.get('books',[]))}<br/><br/><b>Websites:</b><br/>{make_bullet_list(res.get('websites',[]))}<br/><br/><b>Videos:</b><br/>{make_bullet_list(res.get('videos',[]))}"
+    aids_html = (
+        f"<b>Teaching Aids:</b><br/>{html_bullets(plan.get('teaching_aids', []))}<br/><br/>"
+        f"<b>Art Integration:</b><br/>{html_bullets(plan.get('art_integration', []))}"
+    )
 
-    aids_formatted = f"<b>Teaching Aids:</b><br/>{make_bullet_list(plan_data.get('teaching_aids',[]))}<br/><br/><b>Art Integration:</b><br/>{make_bullet_list(plan_data.get('art_integration',[]))}"
+    rows = [
+        ["Curriculum Goal (NCF-SE 2023)", esc(plan.get("curriculum_goal", ""))],
+        ["Relevant Competencies", html_bullets(plan.get("relevant_competencies", []))],
+        ["Learning Objectives", html_bullets(plan.get("learning_objectives", []))],
+        ["Expected Learning Outcomes", html_bullets(plan.get("expected_learning_outcomes", []))],
+    ]
+    if plan.get("formulas_and_equations"):
+        rows.append(["Key Formulas & Equations", html_bullets(plan["formulas_and_equations"])])
+    rows.extend([
+        ["Teaching Methodology", html_bullets(plan.get("teaching_methodology", []))],
+        ["Teaching Aids & Art Integration", aids_html],
+        ["Connecting Previous Knowledge", html_bullets(plan.get("previous_knowledge", []))],
+        ["Innovative Techniques", html_bullets(plan.get("innovative_techniques", []))],
+        ["Content / Teaching Points", cp_html],
+        ["Project / Experiential Learning", html_bullets(plan.get("projects_experiential", []))],
+        ["Skills Acquired", html_bullets(plan.get("skills_acquired", []))],
+        ["Values Inculcated", html_bullets(plan.get("values_inculcated", []))],
+        ["Multiple / Periodic Assessment", ass_html],
+        ["Class Work", html_bullets(plan.get("class_work", []))],
+        ["Home Work", html_bullets(plan.get("home_work", []))],
+        ["Remedial Measures", rem_html],
+        ["Resources & References", res_html],
+    ])
 
     details_data = [
-        [Paragraph("<b>Curriculum Goal (NCF 2023)</b>", body_style), Paragraph(plan_data.get("curriculum_goal",""), body_style)],
-        [Paragraph("<b>Relevant Competencies</b>", body_style), Paragraph(make_bullet_list(plan_data.get("relevant_competencies",[])), body_style)],
-        [Paragraph("<b>Learning Objectives</b>", body_style), Paragraph(make_bullet_list(plan_data.get("learning_objectives",[])), body_style)],
-        [Paragraph("<b>Expected Learning Outcomes</b>", body_style), Paragraph(make_bullet_list(plan_data.get("expected_learning_outcomes",[])), body_style)],
+        [Paragraph(f"<b>{label}</b>", body), Paragraph(value, body)]
+        for label, value in rows
     ]
 
-    if "formulas_and_equations" in plan_data and plan_data["formulas_and_equations"]:
-        details_data.append([Paragraph("<b>Key Formulas & Equations</b>", body_style), Paragraph(make_bullet_list(plan_data.get("formulas_and_equations",[])), body_style)])
-
-    details_data.extend([
-        [Paragraph("<b>Teaching Methodology</b>", body_style), Paragraph(make_bullet_list(plan_data.get("teaching_methodology",[])), body_style)],
-        [Paragraph("<b>Teaching Aids & Art Integration</b>", body_style), Paragraph(aids_formatted, body_style)],
-        [Paragraph("<b>Connecting Previous Knowledge</b>", body_style), Paragraph(make_bullet_list(plan_data.get("previous_knowledge",[])), body_style)],
-        [Paragraph("<b>Innovative Techniques</b>", body_style), Paragraph(make_bullet_list(plan_data.get("innovative_techniques",[])), body_style)],
-        [Paragraph("<b>Content / Teaching Points</b>", body_style), Paragraph(cp_formatted, body_style)],
-        [Paragraph("<b>Project / Experiential Learning</b>", body_style), Paragraph(make_bullet_list(plan_data.get("projects_experiential",[])), body_style)],
-        [Paragraph("<b>Skills Acquired</b>", body_style), Paragraph(make_bullet_list(plan_data.get("skills_acquired",[])), body_style)],
-        [Paragraph("<b>Values Inculcated</b>", body_style), Paragraph(make_bullet_list(plan_data.get("values_inculcated",[])), body_style)],
-        [Paragraph("<b>Multiple / Periodic Assessment</b>", body_style), Paragraph(ass_formatted, body_style)],
-        [Paragraph("<b>Class Work</b>", body_style), Paragraph(make_bullet_list(plan_data.get("class_work",[])), body_style)],
-        [Paragraph("<b>Home Work</b>", body_style), Paragraph(make_bullet_list(plan_data.get("home_work",[])), body_style)],
-        [Paragraph("<b>Remedial Measures</b>", body_style), Paragraph(rem_formatted, body_style)],
-        [Paragraph("<b>Resources & References</b>", body_style), Paragraph(res_formatted, body_style)],
-    ])
-    
-    details_table = Table(details_data, colWidths=[140, 400])
+    details_table = Table(details_data, colWidths=[135, 385], repeatRows=0)
     details_table.setStyle(TableStyle([
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#CBD5E0')),
-        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#EDF2F7')),
-        ('PADDING', (0,0), (-1,-1), 4),
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E0")),
+        ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#EDF2F7")),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
     story.append(details_table)
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 14))
 
-    sig_data = [["___________________\nSubject Teacher", "___________________\nHOD", "___________________\nPrincipal"]]
-    sig_table = Table(sig_data, colWidths=[180, 180, 180])
-    sig_table.setStyle(TableStyle([('ALIGN', (0,0), (-1,-1), 'CENTER')]))
+    sig_table = Table(
+        [["___________________\nSubject Teacher",
+          "___________________\nHOD",
+          "___________________\nPrincipal"]],
+        colWidths=[173, 173, 173],
+    )
+    sig_table.setStyle(TableStyle([
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("FONTSIZE", (0, 0), (-1, -1), 8),
+    ]))
     story.append(sig_table)
 
     doc.build(story)
     buffer.seek(0)
     return buffer
 
+
 # ---------------------------------------------------------
-# ACTION BUTTON & GENERATION
+# GENERATE
 # ---------------------------------------------------------
 st.divider()
-if st.button("✨ Generate Free AI Lesson Plan & Mind Map", type="primary", use_container_width=True):
+
+if st.button("✨ Generate AI Lesson Plan & Mind Map", type="primary", use_container_width=True):
     if not active_api_key:
-        st.error("⚠️ Gemini API Key is missing. Please enter your GEMINI_API_KEY in the sidebar or environment settings.")
+        st.error("⚠️ Gemini API key is missing. Add it in the sidebar or set GEMINI_API_KEY.")
+    elif uploaded_pdf is not None and uploaded_pdf.size > 25 * 1024 * 1024:
+        st.error("⚠️ File exceeds 25 MB. Please upload a smaller PDF.")
     else:
         chapter_content = ""
         if uploaded_pdf is not None:
-            if uploaded_pdf.size > 25 * 1024 * 1024:
-                st.error("⚠️ File size exceeds 25 MB. Please upload a PDF under 25 MB.")
-            else:
-                with st.spinner("Extracting text from uploaded PDF..."):
-                    chapter_content = extract_text_from_pdf(uploaded_pdf)
+            with st.spinner("Extracting text from the uploaded PDF..."):
+                chapter_content = extract_text_from_pdf(uploaded_pdf)
+            if not chapter_content.strip():
+                st.warning(
+                    "No selectable text found in that PDF (it may be a scanned image). "
+                    "Paste the chapter text in the second tab instead."
+                )
         elif pasted_text.strip():
             chapter_content = pasted_text.strip()
         else:
-            chapter_content = f"Standard NCERT syllabus content for {subject} Class {grade} Chapter: {chapter}."
+            chapter_content = (
+                f"Standard NCERT syllabus content for {subject}, Class {grade}, "
+                f"Chapter: {chapter}."
+            )
 
-        if uploaded_pdf is None or uploaded_pdf.size <= 25 * 1024 * 1024:
-            with st.spinner("🧠 Analyzing chapter content with Gemini AI..."):
-                try:
-                    plan_data = generate_ai_lesson_plan(
-                        active_api_key, subject, grade, section, chapter, month, periods, chapter_content
-                    )
-                    st.session_state['plan_data'] = plan_data
-                    st.session_state['meta'] = {
-                        'teacher': teacher_name, 'subject': subject, 'grade': grade,
-                        'section': section, 'chapter': chapter, 'periods': periods, 'month': month
-                    }
-                    st.success("🎉 Lesson Plan Generated Successfully!")
-                except Exception as e:
-                    st.error(f"Error generating lesson plan: {str(e)}")
+        with st.spinner("🧠 Analysing the chapter with Gemini..."):
+            try:
+                plan_data, used_model = generate_ai_lesson_plan(
+                    active_api_key, subject, grade, section,
+                    chapter, month, periods, chapter_content,
+                )
+                st.session_state["plan_data"] = plan_data
+                st.session_state["meta"] = {
+                    "teacher": teacher_name, "subject": subject, "grade": grade,
+                    "section": section, "chapter": chapter,
+                    "periods": periods, "month": month,
+                }
+                st.success(f"🎉 Lesson plan generated using **{used_model}**")
+            except Exception as exc:
+                st.error("Could not generate the lesson plan.")
+                st.code(str(exc))
 
 # ---------------------------------------------------------
-# RENDER OUTPUT & DOWNLOADS
+# OUTPUT
 # ---------------------------------------------------------
-if 'plan_data' in st.session_state:
-    data = st.session_state['plan_data']
-    meta = st.session_state['meta']
-    
+if "plan_data" in st.session_state:
+    data = st.session_state["plan_data"]
+    meta = st.session_state["meta"]
+
     st.subheader(f"📋 Preview: {meta['chapter']} ({meta['subject']})")
-    st.markdown(f"**Curriculum Goal:** {data.get('curriculum_goal','')}")
-    
+    st.markdown(f"**Curriculum Goal:** {data.get('curriculum_goal', '')}")
+
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("### Learning Objectives")
-        for obj in data.get('learning_objectives', []):
+        for obj in data.get("learning_objectives", []):
             st.markdown(f"- {obj}")
-            
     with col2:
         st.markdown("### Expected Outcomes")
-        for outcome in data.get('expected_learning_outcomes', []):
+        for outcome in data.get("expected_learning_outcomes", []):
             st.markdown(f"- {outcome}")
 
-    if "formulas_and_equations" in data and data["formulas_and_equations"]:
+    if data.get("formulas_and_equations"):
         st.divider()
         st.subheader("📐 Key Formulas & Laws Extracted")
-        for f in data["formulas_and_equations"]:
-            st.info(f"⚡ {f}")
+        for formula in data["formulas_and_equations"]:
+            st.info(f"⚡ {formula}")
 
-    # Mind Map Section
     st.divider()
     st.subheader(f"🧠 Visual Mind Map: {meta['chapter']}")
-
     try:
-        dot = graphviz.Digraph(comment=meta['chapter'])
-        dot.attr(rankdir='LR', size='8,5', node_style='filled', fillcolor='#EBF8FF', color='#2B6CB0', fontname='Helvetica')
-        dot.node('CENTER', meta['chapter'], shape='box', fillcolor='#2B6CB0', fontcolor='white')
+        dot = graphviz.Digraph(comment=meta["chapter"])
+        dot.attr(rankdir="LR", splines="ortho")
+        dot.attr("node", style="filled", fillcolor="#EBF8FF",
+                 color="#2B6CB0", fontname="Helvetica", fontsize="10", shape="box")
+        dot.node("CENTER", meta["chapter"], fillcolor="#2B6CB0", fontcolor="white")
 
-        subtopic_idx = 0
-        for item in data.get('content_points', []):
-            section_name = item.get('section', 'Core Concepts')
-            section_id = f"SEC_{subtopic_idx}"
-            
-            dot.node(section_id, section_name, shape='ellipse', fillcolor='#E2E8F0')
-            dot.edge('CENTER', section_id)
-            
-            for topic in item.get('topics', []):
-                topic_id = f"TOP_{subtopic_idx}"
-                dot.node(topic_id, topic, shape='plaintext')
+        for s_idx, item in enumerate(data.get("content_points", [])):
+            section_id = f"SEC{s_idx}"
+            dot.node(section_id, item.get("section", "Core Concepts"),
+                     shape="ellipse", fillcolor="#E2E8F0")
+            dot.edge("CENTER", section_id)
+            for t_idx, topic in enumerate(item.get("topics", [])):
+                topic_id = f"SEC{s_idx}_T{t_idx}"
+                dot.node(topic_id, topic, fillcolor="#FFFFFF")
                 dot.edge(section_id, topic_id)
-                subtopic_idx += 1
 
         st.graphviz_chart(dot, use_container_width=True)
-    except Exception as g_err:
-        st.warning("Mind map chart rendering skipped (Graphviz library missing). Document exports below contain full contents.")
+    except Exception:
+        st.warning("Mind map rendering skipped. The downloads below still contain everything.")
 
     st.divider()
-    
+    safe_chapter = meta["chapter"].replace(" ", "_").replace("/", "-")
+
     col_pdf, col_docx = st.columns(2)
-    
     with col_pdf:
-        pdf_file = generate_pdf(meta, data)
         st.download_button(
             label="📄 Download Official PDF",
-            data=pdf_file,
-            file_name=f"ABPS_Lesson_Plan_{meta['grade']}_{meta['chapter'].replace(' ', '_')}.pdf",
+            data=generate_pdf(meta, data),
+            file_name=f"ABPS_Lesson_Plan_{meta['grade']}_{safe_chapter}.pdf",
             mime="application/pdf",
-            use_container_width=True
+            use_container_width=True,
         )
-        
     with col_docx:
-        docx_file = generate_docx(meta, data)
         st.download_button(
-            label="📝 Download Editable Word Document (.docx)",
-            data=docx_file,
-            file_name=f"ABPS_Lesson_Plan_{meta['grade']}_{meta['chapter'].replace(' ', '_')}.docx",
+            label="📝 Download Editable Word (.docx)",
+            data=generate_docx(meta, data),
+            file_name=f"ABPS_Lesson_Plan_{meta['grade']}_{safe_chapter}.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             type="primary",
-            use_container_width=True
+            use_container_width=True,
         )
