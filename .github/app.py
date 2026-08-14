@@ -149,11 +149,11 @@ def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, pe
     Do not add markdown backticks like ```json. Return raw JSON string only.
     """
 
+    # Updated active models supported by google-genai
     candidate_models = [
         'gemini-2.5-flash',
         'gemini-2.0-flash',
-        'gemini-1.5-flash',
-        'gemini-1.5-pro'
+        'gemini-2.5-pro'
     ]
 
     last_exception = None
