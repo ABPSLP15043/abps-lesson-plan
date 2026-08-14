@@ -149,15 +149,35 @@ def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, pe
     Do not add markdown backticks like ```json. Return raw JSON string only.
     """
 
-    response = client.models.generate_content(
-        model='gemini-2.0-flash',
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json"
-        )
-    )
-    
-    return json.loads(response.text)
+    # Automatic fallback array to guarantee execution regardless of endpoint model updates
+    candidate_models = [
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro'
+    ]
+
+    last_exception = None
+    for model_name in candidate_models:
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
+            )
+            raw_text = response.text.strip()
+            if raw_text.startswith("```json"):
+                raw_text = raw_text[7:]
+            if raw_text.endswith("```"):
+                raw_text = raw_text[:-3]
+            return json.loads(raw_text.strip())
+        except Exception as e:
+            last_exception = e
+            continue
+
+    raise last_exception
 
 # Word Document Generator
 def set_cell_background(cell, fill_color):
@@ -493,12 +513,4 @@ if 'plan_data' in st.session_state:
         )
         
     with col_docx:
-        docx_file = generate_docx(meta, data)
-        st.download_button(
-            label="📝 Download Editable Word Document (.docx)",
-            data=docx_file,
-            file_name=f"ABPS_Lesson_Plan_{meta['grade']}_{meta['chapter'].replace(' ', '_')}.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            type="primary",
-            use_container_width=True
-        )
+        docx_file = generate_docx(meta,
