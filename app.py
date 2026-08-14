@@ -31,186 +31,160 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------
-# 2. COMPLETE UI OVERHAUL: MODERN GLASSMORPHISM & CONTRAST FIX
+# 2. LANDING PAGE & UI STYLING
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-    /* Google Fonts Import */
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
-    }
+html, body, [class*="css"]  {
+    font-family: 'Inter', sans-serif !important;
+}
 
-    /* Vibrant Modern Mesh Gradient Background */
-    .stApp {
-        background: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
-                    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
-                    radial-gradient(at 0% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
-                    #f8fafc;
-        background-attachment: fixed;
-    }
+.stApp {
+    background:
+        radial-gradient(circle at top left, rgba(59,130,246,0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(168,85,247,0.16), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(16,185,129,0.14), transparent 26%),
+        linear-gradient(135deg, #f8fbff 0%, #eef4ff 45%, #f7f5ff 100%);
+    background-attachment: fixed;
+}
 
-    /* Header & Titles */
-    .stApp h1 {
-        background: linear-gradient(135deg, #0f172a 0%, #2563eb 50%, #7c3aed 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 800 !important;
-        font-size: 2.6rem !important;
-        letter-spacing: -0.03em;
-        margin-bottom: 0.2rem;
-    }
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
 
-    .stApp [data-testid="stCaptionContainer"] {
-        color: #475569 !important;
-        font-size: 1.05rem !important;
-        font-weight: 600 !important;
-    }
+h1 {
+    background: linear-gradient(90deg, #0f172a 0%, #2563eb 45%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.2rem !important;
+}
 
-    /* Subsections */
-    .stApp h2, .stApp h3 {
-        color: #1e293b !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.02em;
-    }
+[data-testid="stCaptionContainer"] {
+    color: #475569 !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+}
 
-    /* SIDEBAR & DROPDOWN CONTRAST FIX */
-    [data-testid="stSidebar"] {
-        background: #0f172a !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-    }
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%) !important;
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
 
-    /* Sidebar Labels */
-    [data-testid="stSidebar"] label {
-        color: #e2e8f0 !important;
-        font-weight: 600 !important;
-        font-size: 0.9rem !important;
-    }
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] div {
+    color: #e5eefc !important;
+}
 
-    /* Sidebar Text Inputs & Selectboxes Fix */
-    [data-testid="stSidebar"] input, 
-    [data-testid="stSidebar"] div[role="combobox"],
-    [data-testid="stSidebar"] select {
-        background-color: #1e293b !important;
-        color: #f8fafc !important;
-        border: 1px solid #334155 !important;
-        border-radius: 10px !important;
-    }
+[data-testid="stSidebar"] input,
+[data-testid="stSidebar"] textarea,
+[data-testid="stSidebar"] div[role="combobox"] {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+}
 
-    /* Selectbox Dropdown Menu Options */
-    div[data-baseweb="popover"] ul {
-        background-color: #1e293b !important;
-        border: 1px solid #334155 !important;
-    }
-    div[data-baseweb="popover"] li {
-        color: #f8fafc !important;
-    }
-    div[data-baseweb="popover"] li:hover {
-        background-color: #334155 !important;
-    }
+div[data-baseweb="popover"] ul {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+}
 
-    /* FROSTED GLASS CARDS & TABS */
-    [data-testid="stTabs"] {
-        background: rgba(255, 255, 255, 0.75) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.8) !important;
-        border-radius: 20px !important;
-        padding: 1.5rem !important;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03) !important;
-    }
+div[data-baseweb="popover"] li {
+    color: #f8fafc !important;
+}
 
-    button[data-baseweb="tab"] {
-        background: transparent !important;
-        border-radius: 10px !important;
-        color: #64748b !important;
-        font-weight: 600 !important;
-        padding: 0.5rem 1rem !important;
-        transition: all 0.2s ease !important;
-    }
-    button[data-baseweb="tab"][aria-selected="true"] {
-        background: #ffffff !important;
-        color: #2563eb !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-    }
+div[data-baseweb="popover"] li:hover {
+    background: #334155 !important;
+}
 
-    .stTextArea textarea, .stFileUploader {
-        background: rgba(255, 255, 255, 0.85) !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 12px !important;
-        color: #0f172a !important;
-    }
+[data-testid="stTabs"] {
+    background: rgba(255,255,255,0.62) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    border: 1px solid rgba(255,255,255,0.7) !important;
+    border-radius: 22px !important;
+    padding: 1.2rem !important;
+    box-shadow: 0 16px 40px rgba(15,23,42,0.08) !important;
+}
 
-    /* BUTTONS */
-    div.stButton > button {
-        background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,244,255,0.8) 100%) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(99, 102, 241, 0.3) !important;
-        border-radius: 12px !important;
-        color: #1e1b4b !important;
-        font-weight: 700 !important;
-        padding: 0.75rem 1.5rem !important;
-        box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.05) !important;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
+button[data-baseweb="tab"] {
+    border-radius: 999px !important;
+    color: #64748b !important;
+    font-weight: 700 !important;
+    transition: all 0.2s ease !important;
+}
 
-    div.stButton > button:hover {
-        transform: translateY(-2px) scale(1.01);
-        border-color: rgba(99, 102, 241, 0.6) !important;
-        box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.25) !important;
-        color: #4f46e5 !important;
-    }
+button[data-baseweb="tab"][aria-selected="true"] {
+    background: linear-gradient(90deg, #2563eb, #7c3aed) !important;
+    color: white !important;
+    box-shadow: 0 8px 20px rgba(99,102,241,0.28) !important;
+}
 
-    div.stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%) !important;
-        color: #ffffff !important;
-        border: none !important;
-        box-shadow: 0 8px 25px -5px rgba(37, 99, 235, 0.4) !important;
-    }
+.stTextArea textarea, .stFileUploader {
+    background: rgba(255,255,255,0.84) !important;
+    border: 1px solid #dbe7ff !important;
+    border-radius: 16px !important;
+    color: #0f172a !important;
+    box-shadow: 0 10px 24px rgba(15,23,42,0.04) !important;
+}
 
-    div.stButton > button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%) !important;
-        transform: translateY(-2px) scale(1.01);
-        box-shadow: 0 12px 30px -5px rgba(37, 99, 235, 0.6) !important;
-    }
+div.stButton > button {
+    border: none !important;
+    border-radius: 16px !important;
+    font-weight: 800 !important;
+    padding: 0.75rem 1.2rem !important;
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 14px 30px rgba(99,102,241,0.28) !important;
+    transition: all 0.25s ease !important;
+}
 
-    div[data-testid="stDownloadButton"] > button {
-        background: rgba(16, 185, 129, 0.1) !important;
-        border: 1px solid rgba(16, 185, 129, 0.4) !important;
-        color: #047857 !important;
-        font-weight: 700 !important;
-        border-radius: 12px !important;
-        transition: all 0.25s ease !important;
-    }
+div.stButton > button:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 18px 34px rgba(99,102,241,0.38) !important;
+}
 
-    div[data-testid="stDownloadButton"] > button:hover {
-        background: #10b981 !important;
-        color: #ffffff !important;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.3) !important;
-    }
+div[data-testid="stDownloadButton"] > button {
+    border-radius: 14px !important;
+    font-weight: 700 !important;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+    color: #065f46 !important;
+    border: 1px solid #a7f3d0 !important;
+}
+
+div[data-testid="stDownloadButton"] > button:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# VALID GEMINI MODELS (UPDATED)
+# 3. CONFIG & MODEL PREFERENCES
 # ---------------------------------------------------------
-CANDIDATE_MODELS = [
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
+PREFERRED_MODELS = [
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite",
+    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash",
 ]
 
-# ---------------------------------------------------------
-# JSON SCHEMA FOR THE LESSON PLAN
-# ---------------------------------------------------------
-_STR_LIST = {"type": "ARRAY", "items": {"type": "STRING"}}
+_STR_LIST = {"type": "array", "items": {"type": "string"}}
 
 LESSON_PLAN_SCHEMA = {
-    "type": "OBJECT",
+    "type": "object",
     "properties": {
-        "curriculum_goal": {"type": "STRING", "description": "NCF-SE 2023 curriculum goal for this chapter."},
+        "curriculum_goal": {"type": "string"},
         "relevant_competencies": _STR_LIST,
         "learning_objectives": _STR_LIST,
         "expected_learning_outcomes": _STR_LIST,
@@ -221,57 +195,70 @@ LESSON_PLAN_SCHEMA = {
         "previous_knowledge": _STR_LIST,
         "innovative_techniques": _STR_LIST,
         "content_points": {
-            "type": "ARRAY",
+            "type": "array",
             "items": {
-                "type": "OBJECT",
+                "type": "object",
                 "properties": {
-                    "section": {"type": "STRING"},
+                    "section": {"type": "string"},
                     "topics": _STR_LIST
                 },
-                "required": ["section", "topics"],
-            },
+                "required": ["section", "topics"]
+            }
         },
         "projects_experiential": _STR_LIST,
         "skills_acquired": _STR_LIST,
         "values_inculcated": _STR_LIST,
         "multiple_assessment": {
-            "type": "OBJECT",
+            "type": "object",
             "properties": {
                 "oral_questions": _STR_LIST,
                 "worksheet": _STR_LIST,
                 "practical": _STR_LIST,
-                "exit_ticket": _STR_LIST,
+                "exit_ticket": _STR_LIST
             },
-            "required": ["oral_questions", "worksheet", "practical", "exit_ticket"],
+            "required": ["oral_questions", "worksheet", "practical", "exit_ticket"]
         },
         "class_work": _STR_LIST,
         "home_work": _STR_LIST,
         "remedial_measures": {
-            "type": "OBJECT",
+            "type": "object",
             "properties": {
                 "slow_learners": _STR_LIST,
                 "advanced_learners": _STR_LIST
             },
-            "required": ["slow_learners", "advanced_learners"],
+            "required": ["slow_learners", "advanced_learners"]
         },
         "resources": {
-            "type": "OBJECT",
+            "type": "object",
             "properties": {
                 "books": _STR_LIST,
                 "websites": _STR_LIST,
                 "videos": _STR_LIST
             },
-            "required": ["books", "websites", "videos"],
-        },
+            "required": ["books", "websites", "videos"]
+        }
     },
     "required": [
-        "curriculum_goal", "relevant_competencies", "learning_objectives",
-        "expected_learning_outcomes", "teaching_methodology", "teaching_aids",
-        "art_integration", "previous_knowledge", "innovative_techniques",
-        "content_points", "projects_experiential", "skills_acquired",
-        "values_inculcated", "multiple_assessment", "class_work", "home_work",
-        "remedial_measures", "resources",
-    ],
+        "curriculum_goal",
+        "relevant_competencies",
+        "learning_objectives",
+        "expected_learning_outcomes",
+        "formulas_and_equations",
+        "teaching_methodology",
+        "teaching_aids",
+        "art_integration",
+        "previous_knowledge",
+        "innovative_techniques",
+        "content_points",
+        "projects_experiential",
+        "skills_acquired",
+        "values_inculcated",
+        "multiple_assessment",
+        "class_work",
+        "home_work",
+        "remedial_measures",
+        "resources"
+    ]
 }
 
 # ---------------------------------------------------------
@@ -319,7 +306,6 @@ periods = st.sidebar.number_input("No. of Periods", min_value=1, max_value=25, v
 
 st.sidebar.divider()
 
-# Diagnostic check
 if st.sidebar.button("🔍 Check available models"):
     if not active_api_key:
         st.sidebar.error("Enter an API key first.")
@@ -356,70 +342,93 @@ with tab2:
     )
 
 # ---------------------------------------------------------
-# HELPERS
+# HELPERS & MODEL RESOLUTION
 # ---------------------------------------------------------
-def extract_text_from_pdf(uploaded_file, max_pages=40):
-    reader = PdfReader(uploaded_file)
+@st.cache_data(show_spinner=False)
+def extract_text_cached(file_bytes):
+    reader = PdfReader(io.BytesIO(file_bytes))
     parts = []
-    for page in reader.pages[:max_pages]:
+    for page in reader.pages[:20]:
         text = page.extract_text()
         if text:
             parts.append(text)
     return "\n".join(parts)
 
-def strip_code_fences(text):
-    text = text.strip()
-    if text.startswith("```"):
-        text = text.split("\n", 1)[-1] if "\n" in text else text[3:]
-    if text.endswith("```"):
-        text = text[:-3]
-    return text.strip()
+def get_available_model(client):
+    available = []
+    for m in client.models.list():
+        name = getattr(m, "name", "")
+        if name.startswith("models/"):
+            name = name.replace("models/", "")
+        available.append(name)
 
-def build_prompt(subject, grade, section, chapter, month, periods, chapter_content):
-    return (
-        "You are an expert curriculum designer for Indian schools following the "
-        "NCF-SE 2023 and NEP 2020 guidelines for NCERT textbooks.\n\n"
-        "Using the chapter content supplied below, produce a HIGHLY SPECIFIC, UNIQUE and "
-        "ACCURATE lesson plan. Every item must refer to the actual content of this chapter, "
-        "never generic placeholders. Include real formulas, laws, definitions, dates or "
-        "terms wherever the subject calls for them.\n\n"
-        f"Subject: {subject}\n"
-        f"Class / Section: {grade} - {section}\n"
-        f"Chapter: {chapter}\n"
-        f"Month: {month}\n"
-        f"Number of periods: {periods}\n\n"
-        "--- CHAPTER CONTENT ---\n"
-        f"{chapter_content[:12000]}\n"
-        "--- END CHAPTER CONTENT ---\n\n"
-        "Give 4 to 8 items in each list where the chapter supports it. "
-        "Give at least 3 sections in content_points, each with 2 or more topics. "
-        "If the chapter has no formulas or equations, return an empty list for that field."
-    )
+    for preferred in PREFERRED_MODELS:
+        if preferred in available:
+            return preferred, available
 
-def generate_ai_lesson_plan(api_key, subject, grade, section, chapter,
-                            month, periods, chapter_content):
-    client = genai.Client(api_key=api_key)
-    prompt = build_prompt(subject, grade, section, chapter, month, periods, chapter_content)
-
-    failures = []
-    for model_name in CANDIDATE_MODELS:
-        try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=LESSON_PLAN_SCHEMA,
-                ),
-            )
-            raw = response.text
-            return json.loads(strip_code_fences(raw)), model_name
-        except Exception as exc:
-            failures.append(f"• {model_name} → {exc}")
+    for name in available:
+        if "flash" in name.lower():
+            return name, available
 
     raise RuntimeError(
-        "Every candidate model failed.\n\n" + "\n".join(failures)
+        "No supported Flash model found for this API key.\n\nAvailable models:\n- " +
+        "\n- ".join(available[:50])
     )
+
+def generate_ai_lesson_plan(api_key, subject, grade, section, chapter, month, periods, chapter_content):
+    client = genai.Client(api_key=api_key)
+    model_name, available_models = get_available_model(client)
+
+    prompt = f"""
+You are an expert curriculum designer for Indian schools following NCF-SE 2023 and NEP 2020.
+
+Create a specific, chapter-based lesson plan.
+
+Subject: {subject}
+Class/Section: {grade} - {section}
+Chapter: {chapter}
+Month: {month}
+Periods: {periods}
+
+CHAPTER CONTENT:{chapter_content[:7000]}
+
+Rules:
+- Be specific to the chapter
+- Avoid generic placeholders
+- Keep outputs concise and practical for teachers
+- If no formulas exist, return an empty list
+- Keep most lists between 3 and 6 items
+"""
+
+    if hasattr(client, "interactions"):
+        result = client.interactions.create(
+            model=model_name,
+            input=prompt,
+            response_format={
+                "type": "text",
+                "mime_type": "application/json",
+                "schema": LESSON_PLAN_SCHEMA
+            }
+        )
+        raw = result.output_text
+    else:
+        response = client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=LESSON_PLAN_SCHEMA
+            )
+        )
+        raw = response.text
+
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[-1]
+    if raw.endswith("```"):
+        raw = raw[:-3]
+
+    return json.loads(raw.strip()), model_name, available_models
 
 # ---------------------------------------------------------
 # WORD EXPORT
@@ -709,51 +718,53 @@ def generate_pdf(meta, plan):
     return buffer
 
 # ---------------------------------------------------------
-# GENERATE
+# GENERATION EXECUTION
 # ---------------------------------------------------------
 st.divider()
 if st.button("✨ Generate AI Lesson Plan & Mind Map", type="primary", use_container_width=True):
     if not active_api_key:
-        st.error("⚠️ Gemini API key is missing. Add it in the sidebar or set GEMINI_API_KEY.")
+        st.error("⚠️ Gemini API key is missing.")
     elif uploaded_pdf is not None and uploaded_pdf.size > 25 * 1024 * 1024:
-        st.error("⚠️ File exceeds 25 MB. Please upload a smaller PDF.")
+        st.error("⚠️ File exceeds 25 MB.")
     else:
         chapter_content = ""
+
         if uploaded_pdf is not None:
-            with st.spinner("Extracting text from the uploaded PDF..."):
-                chapter_content = extract_text_from_pdf(uploaded_pdf)
+            with st.spinner("Extracting text from PDF..."):
+                chapter_content = extract_text_cached(uploaded_pdf.getvalue())
             if not chapter_content.strip():
-                st.warning(
-                    "No selectable text found in that PDF (it may be a scanned image). "
-                    "Paste the chapter text in the second tab instead."
-                )
+                st.warning("No selectable text found in the PDF. Please paste chapter text manually.")
         elif pasted_text.strip():
             chapter_content = pasted_text.strip()
         else:
-            chapter_content = (
-                f"Standard NCERT syllabus content for {subject}, Class {grade}, "
-                f"Chapter: {chapter}."
-            )
+            chapter_content = f"NCERT content for {subject}, class {grade}, chapter {chapter}"
 
-        with st.spinner("🧠 Analysing the chapter with Gemini..."):
+        with st.spinner("Generating lesson plan..."):
             try:
-                plan_data, used_model = generate_ai_lesson_plan(
-                    active_api_key, subject, grade, section,
-                    chapter, month, periods, chapter_content,
+                plan_data, used_model, available_models = generate_ai_lesson_plan(
+                    active_api_key, subject, grade, section, chapter, month, periods, chapter_content
                 )
+
                 st.session_state["plan_data"] = plan_data
                 st.session_state["meta"] = {
-                    "teacher": teacher_name, "subject": subject, "grade": grade,
-                    "section": section, "chapter": chapter,
-                    "periods": periods, "month": month,
+                    "teacher": teacher_name,
+                    "subject": subject,
+                    "grade": grade,
+                    "section": section,
+                    "chapter": chapter,
+                    "periods": periods,
+                    "month": month
                 }
-                st.success(f"🎉 Lesson plan generated using **{used_model}**")
-            except Exception as exc:
-                st.error("Could not generate the lesson plan.")
-                st.code(str(exc))
+
+                st.success(f"✅ Lesson plan generated using {used_model}")
+                with st.expander("Available models detected for this API key"):
+                    st.code("\n".join(available_models[:50]))
+            except Exception as e:
+                st.error("Lesson plan generation failed.")
+                st.code(str(e))
 
 # ---------------------------------------------------------
-# OUTPUT
+# OUTPUT PRESENTATION
 # ---------------------------------------------------------
 if "plan_data" in st.session_state:
     data = st.session_state["plan_data"]
@@ -799,7 +810,7 @@ if "plan_data" in st.session_state:
 
         st.graphviz_chart(dot, use_container_width=True)
     except Exception:
-        st.warning("Mind map rendering skipped. The downloads below still contain everything.")
+        st.warning("Mind map rendering skipped. Downloads below contain all details.")
 
     st.divider()
     safe_chapter = meta["chapter"].replace(" ", "_").replace("/", "-")
