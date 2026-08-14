@@ -2,12 +2,12 @@ import io
 import json
 import os
 from xml.sax.saxutils import escape as xml_escape
-
 import streamlit as st
 import docx
 import graphviz
 from pypdf import PdfReader
 from google import genai
+from google.genai import types
 
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -21,24 +21,165 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
-# MODELS  (current as of the Gemini Interactions API)
+# 1. PAGE CONFIG (Must be the very first Streamlit command)
+# ---------------------------------------------------------
+st.set_page_config(
+    page_title="ABPS Baikunth - AI Lesson Plan Generator",
+    page_icon="🏫",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# ---------------------------------------------------------
+# 2. CUSTOM CSS: HEADER & TITLE STYLING
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+    /* Google Fonts Import */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Gradient Background for App */
+    .stApp {
+        background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+    }
+
+    /* Gradient Styling for Main Header */
+    .stApp h1 {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800 !important;
+        font-size: 2.5rem !important;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.2rem;
+    }
+
+    /* Subtitle / Caption Styling */
+    .stApp [data-testid="stCaptionContainer"] {
+        color: #475569;
+        font-size: 1rem !important;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Section Subheaders (h2, h3) */
+    .stApp h2, .stApp h3 {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.02em;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# 3. CUSTOM CSS: GLASSMORPHISM BUTTONS
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+    /* Glassmorphism Effect for All Standard Buttons */
+    div.stButton > button {
+        background: rgba(255, 255, 255, 0.35) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.6) !important;
+        border-radius: 12px !important;
+        color: #0f172a !important;
+        font-weight: 600 !important;
+        padding: 0.6rem 1.2rem !important;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08) !important;
+        transition: all 0.3s ease-in-out !important;
+    }
+
+    /* Hover State for Standard Buttons */
+    div.stButton > button:hover {
+        background: rgba(255, 255, 255, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.9) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.18) !important;
+        color: #1e3a8a !important;
+    }
+
+    /* Glassmorphism Effect for Download Buttons */
+    div[data-testid="stDownloadButton"] > button {
+        background: rgba(59, 130, 246, 0.15) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(59, 130, 246, 0.35) !important;
+        border-radius: 12px !important;
+        color: #1e40af !important;
+        font-weight: 600 !important;
+        box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.12) !important;
+        transition: all 0.3s ease-in-out !important;
+    }
+
+    /* Hover State for Download Buttons */
+    div[data-testid="stDownloadButton"] > button:hover {
+        background: rgba(59, 130, 246, 0.3) !important;
+        border: 1px solid rgba(59, 130, 246, 0.6) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px 0 rgba(59, 130, 246, 0.22) !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# 4. CUSTOM CSS: GLASSMORPHISM TABS, CARDS & SIDEBAR
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+    /* Glassmorphism Container for Input Tabs and Text Areas */
+    [data-testid="stTabs"], .stTextArea, .stFileUploader {
+        background: rgba(255, 255, 255, 0.45) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.6) !important;
+        border-radius: 16px !important;
+        padding: 1.2rem !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05) !important;
+    }
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background: #1e293b;
+        color: #f8fafc;
+    }
+
+    [data-testid="stSidebar"] * {
+        color: #f8fafc !important;
+    }
+
+    [data-testid="stSidebar"] .stTextInput input, 
+    [data-testid="stSidebar"] .stSelectbox select,
+    [data-testid="stSidebar"] .stNumberInput input {
+        background-color: #334155 !important;
+        border: 1px solid #475569 !important;
+        color: #ffffff !important;
+        border-radius: 8px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# VALID GEMINI MODELS
 # ---------------------------------------------------------
 CANDIDATE_MODELS = [
-    "gemini-3.7-flash",
-    "gemini-3.6-flash",
-    "gemini-3.5-flash",
-    "gemini-3.5-flash-lite",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
 ]
 
 # ---------------------------------------------------------
 # JSON SCHEMA FOR THE LESSON PLAN
 # ---------------------------------------------------------
-_STR_LIST = {"type": "array", "items": {"type": "string"}}
+_STR_LIST = {"type": "ARRAY", "items": {"type": "STRING"}}
 
 LESSON_PLAN_SCHEMA = {
-    "type": "object",
+    "type": "OBJECT",
     "properties": {
-        "curriculum_goal": {"type": "string", "description": "NCF-SE 2023 curriculum goal for this chapter."},
+        "curriculum_goal": {"type": "STRING", "description": "NCF-SE 2023 curriculum goal for this chapter."},
         "relevant_competencies": _STR_LIST,
         "learning_objectives": _STR_LIST,
         "expected_learning_outcomes": _STR_LIST,
@@ -49,10 +190,13 @@ LESSON_PLAN_SCHEMA = {
         "previous_knowledge": _STR_LIST,
         "innovative_techniques": _STR_LIST,
         "content_points": {
-            "type": "array",
+            "type": "ARRAY",
             "items": {
-                "type": "object",
-                "properties": {"section": {"type": "string"}, "topics": _STR_LIST},
+                "type": "OBJECT",
+                "properties": {
+                    "section": {"type": "STRING"},
+                    "topics": _STR_LIST
+                },
                 "required": ["section", "topics"],
             },
         },
@@ -60,7 +204,7 @@ LESSON_PLAN_SCHEMA = {
         "skills_acquired": _STR_LIST,
         "values_inculcated": _STR_LIST,
         "multiple_assessment": {
-            "type": "object",
+            "type": "OBJECT",
             "properties": {
                 "oral_questions": _STR_LIST,
                 "worksheet": _STR_LIST,
@@ -72,13 +216,20 @@ LESSON_PLAN_SCHEMA = {
         "class_work": _STR_LIST,
         "home_work": _STR_LIST,
         "remedial_measures": {
-            "type": "object",
-            "properties": {"slow_learners": _STR_LIST, "advanced_learners": _STR_LIST},
+            "type": "OBJECT",
+            "properties": {
+                "slow_learners": _STR_LIST,
+                "advanced_learners": _STR_LIST
+            },
             "required": ["slow_learners", "advanced_learners"],
         },
         "resources": {
-            "type": "object",
-            "properties": {"books": _STR_LIST, "websites": _STR_LIST, "videos": _STR_LIST},
+            "type": "OBJECT",
+            "properties": {
+                "books": _STR_LIST,
+                "websites": _STR_LIST,
+                "videos": _STR_LIST
+            },
             "required": ["books", "websites", "videos"],
         },
     },
@@ -93,15 +244,8 @@ LESSON_PLAN_SCHEMA = {
 }
 
 # ---------------------------------------------------------
-# PAGE CONFIG
+# APPLICATION HEADER
 # ---------------------------------------------------------
-st.set_page_config(
-    page_title="ABPS Baikunth - AI Lesson Plan Generator",
-    page_icon="🏫",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
 st.title("🏫 The Aditya Birla Public School, Baikunth")
 st.caption("AI-Powered NCF-SE 2023 Lesson Plan & Mind Map Generator")
 
@@ -144,7 +288,7 @@ periods = st.sidebar.number_input("No. of Periods", min_value=1, max_value=25, v
 
 st.sidebar.divider()
 
-# Diagnostic: ask the API what models this key can actually use.
+# Diagnostic check
 if st.sidebar.button("🔍 Check available models"):
     if not active_api_key:
         st.sidebar.error("Enter an API key first.")
@@ -171,17 +315,14 @@ tab1, tab2 = st.tabs(["📄 Upload Chapter PDF (Max 25MB)", "📝 Paste Chapter 
 
 uploaded_pdf = None
 pasted_text = ""
-
 with tab1:
     uploaded_pdf = st.file_uploader(
         "Upload NCERT / Textbook Chapter PDF (up to 25 MB)", type=["pdf"]
     )
-
 with tab2:
     pasted_text = st.text_area(
         "Paste text, outline, or key topics from the chapter here:", height=200
     )
-
 
 # ---------------------------------------------------------
 # HELPERS
@@ -195,7 +336,6 @@ def extract_text_from_pdf(uploaded_file, max_pages=40):
             parts.append(text)
     return "\n".join(parts)
 
-
 def strip_code_fences(text):
     text = text.strip()
     if text.startswith("```"):
@@ -203,7 +343,6 @@ def strip_code_fences(text):
     if text.endswith("```"):
         text = text[:-3]
     return text.strip()
-
 
 def build_prompt(subject, grade, section, chapter, month, periods, chapter_content):
     return (
@@ -221,38 +360,10 @@ def build_prompt(subject, grade, section, chapter, month, periods, chapter_conte
         "--- CHAPTER CONTENT ---\n"
         f"{chapter_content[:12000]}\n"
         "--- END CHAPTER CONTENT ---\n\n"
-        "Give 6 to 10 items in each list where the chapter supports it. "
-        "Give at least 4 sections in content_points, each with 3 or more topics. "
+        "Give 4 to 8 items in each list where the chapter supports it. "
+        "Give at least 3 sections in content_points, each with 2 or more topics. "
         "If the chapter has no formulas or equations, return an empty list for that field."
     )
-
-
-def call_model(client, model_name, prompt):
-    """Works with google-genai 2.x (Interactions API) and falls back to 1.x."""
-    if hasattr(client, "interactions"):
-        interaction = client.interactions.create(
-            model=model_name,
-            input=prompt,
-            response_format={
-                "type": "text",
-                "mime_type": "application/json",
-                "schema": LESSON_PLAN_SCHEMA,
-            },
-        )
-        return interaction.output_text
-
-    # Legacy SDK path (google-genai 1.x)
-    from google.genai import types
-    response = client.models.generate_content(
-        model=model_name,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=LESSON_PLAN_SCHEMA,
-        ),
-    )
-    return response.text
-
 
 def generate_ai_lesson_plan(api_key, subject, grade, section, chapter,
                             month, periods, chapter_content):
@@ -262,18 +373,22 @@ def generate_ai_lesson_plan(api_key, subject, grade, section, chapter,
     failures = []
     for model_name in CANDIDATE_MODELS:
         try:
-            raw = call_model(client, model_name, prompt)
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=LESSON_PLAN_SCHEMA,
+                ),
+            )
+            raw = response.text
             return json.loads(strip_code_fences(raw)), model_name
         except Exception as exc:
             failures.append(f"• {model_name} → {exc}")
 
     raise RuntimeError(
-        "Every candidate model failed.\n\n"
-        + "\n".join(failures)
-        + "\n\nClick 'Check available models' in the sidebar to see what your "
-          "API key can actually use, then update CANDIDATE_MODELS at the top of app.py."
+        "Every candidate model failed.\n\n" + "\n".join(failures)
     )
-
 
 # ---------------------------------------------------------
 # WORD EXPORT
@@ -286,12 +401,10 @@ def set_cell_background(cell, fill_color):
     shd.set(qn("w:fill"), fill_color)
     tc_pr.append(shd)
 
-
 def bullets(items):
     if isinstance(items, list):
         return "\n".join(f"• {i}" for i in items)
     return str(items)
-
 
 def generate_docx(meta, plan):
     doc = docx.Document()
@@ -413,20 +526,16 @@ def generate_docx(meta, plan):
     buffer.seek(0)
     return buffer
 
-
 # ---------------------------------------------------------
 # PDF EXPORT
 # ---------------------------------------------------------
 def esc(text):
-    """Escape &, < and > so ReportLab never crashes on chapter text."""
     return xml_escape(str(text))
-
 
 def html_bullets(items):
     if isinstance(items, list):
         return "<br/>".join(f"• {esc(i)}" for i in items)
     return esc(items)
-
 
 def generate_pdf(meta, plan):
     buffer = io.BytesIO()
@@ -568,12 +677,10 @@ def generate_pdf(meta, plan):
     buffer.seek(0)
     return buffer
 
-
 # ---------------------------------------------------------
 # GENERATE
 # ---------------------------------------------------------
 st.divider()
-
 if st.button("✨ Generate AI Lesson Plan & Mind Map", type="primary", use_container_width=True):
     if not active_api_key:
         st.error("⚠️ Gemini API key is missing. Add it in the sidebar or set GEMINI_API_KEY.")
