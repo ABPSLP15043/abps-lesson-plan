@@ -31,7 +31,7 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------
-# 2. CUSTOM CSS: HEADER & TITLE STYLING
+# 2. COMPLETE UI OVERHAUL: MODERN GLASSMORPHISM & CONTRAST FIX
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -39,126 +39,169 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
 
-    /* Gradient Background for App */
+    /* Vibrant Modern Mesh Gradient Background */
     .stApp {
-        background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+        background: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+                    radial-gradient(at 0% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+                    #f8fafc;
+        background-attachment: fixed;
     }
 
-    /* Gradient Styling for Main Header */
+    /* Header & Titles */
     .stApp h1 {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #2563eb 50%, #7c3aed 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 800 !important;
-        font-size: 2.5rem !important;
+        font-size: 2.6rem !important;
         letter-spacing: -0.03em;
         margin-bottom: 0.2rem;
     }
 
-    /* Subtitle / Caption Styling */
     .stApp [data-testid="stCaptionContainer"] {
-        color: #475569;
-        font-size: 1rem !important;
-        font-weight: 500;
-        margin-bottom: 1.5rem;
+        color: #475569 !important;
+        font-size: 1.05rem !important;
+        font-weight: 600 !important;
     }
 
-    /* Section Subheaders (h2, h3) */
+    /* Subsections */
     .stApp h2, .stApp h3 {
-        color: #0f172a !important;
+        color: #1e293b !important;
         font-weight: 700 !important;
         letter-spacing: -0.02em;
     }
-</style>
-""", unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# 3. CUSTOM CSS: GLASSMORPHISM BUTTONS
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-    /* Glassmorphism Effect for All Standard Buttons */
-    div.stButton > button {
-        background: rgba(255, 255, 255, 0.35) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.6) !important;
-        border-radius: 12px !important;
-        color: #0f172a !important;
-        font-weight: 600 !important;
-        padding: 0.6rem 1.2rem !important;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08) !important;
-        transition: all 0.3s ease-in-out !important;
-    }
-
-    /* Hover State for Standard Buttons */
-    div.stButton > button:hover {
-        background: rgba(255, 255, 255, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.9) !important;
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.18) !important;
-        color: #1e3a8a !important;
-    }
-
-    /* Glassmorphism Effect for Download Buttons */
-    div[data-testid="stDownloadButton"] > button {
-        background: rgba(59, 130, 246, 0.15) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
-        border: 1px solid rgba(59, 130, 246, 0.35) !important;
-        border-radius: 12px !important;
-        color: #1e40af !important;
-        font-weight: 600 !important;
-        box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.12) !important;
-        transition: all 0.3s ease-in-out !important;
-    }
-
-    /* Hover State for Download Buttons */
-    div[data-testid="stDownloadButton"] > button:hover {
-        background: rgba(59, 130, 246, 0.3) !important;
-        border: 1px solid rgba(59, 130, 246, 0.6) !important;
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px 0 rgba(59, 130, 246, 0.22) !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# 4. CUSTOM CSS: GLASSMORPHISM TABS, CARDS & SIDEBAR
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-    /* Glassmorphism Container for Input Tabs and Text Areas */
-    [data-testid="stTabs"], .stTextArea, .stFileUploader {
-        background: rgba(255, 255, 255, 0.45) !important;
-        backdrop-filter: blur(16px) !important;
-        -webkit-backdrop-filter: blur(16px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.6) !important;
-        border-radius: 16px !important;
-        padding: 1.2rem !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05) !important;
-    }
-
-    /* Sidebar Styling */
+    /* =========================================================
+       SIDEBAR & DROPDOWN CONTRAST FIX
+       ========================================================= */
     [data-testid="stSidebar"] {
-        background: #1e293b;
-        color: #f8fafc;
+        background: #0f172a !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    [data-testid="stSidebar"] * {
+    /* Sidebar Labels */
+    [data-testid="stSidebar"] label {
+        color: #e2e8f0 !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+    }
+
+    /* Sidebar Text Inputs & Selectboxes Fix */
+    [data-testid="stSidebar"] input, 
+    [data-testid="stSidebar"] div[role="combobox"],
+    [data-testid="stSidebar"] select {
+        background-color: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #334155 !important;
+        border-radius: 10px !important;
+    }
+
+    /* Selectbox Dropdown Menu Options */
+    div[data-baseweb="popover"] ul {
+        background-color: #1e293b !important;
+        border: 1px solid #334155 !important;
+    }
+    div[data-baseweb="popover"] li {
         color: #f8fafc !important;
     }
-
-    [data-testid="stSidebar"] .stTextInput input, 
-    [data-testid="stSidebar"] .stSelectbox select,
-    [data-testid="stSidebar"] .stNumberInput input {
+    div[data-baseweb="popover"] li:hover {
         background-color: #334155 !important;
-        border: 1px solid #475569 !important;
+    }
+
+    /* =========================================================
+       FROSTED GLASS CARDS & TABS
+       ========================================================= */
+    /* Tab Container */
+    [data-testid="stTabs"] {
+        background: rgba(255, 255, 255, 0.75) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.8) !important;
+        border-radius: 20px !important;
+        padding: 1.5rem !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03) !important;
+    }
+
+    /* Customizing Tab Pills */
+    button[data-baseweb="tab"] {
+        background: transparent !important;
+        border-radius: 10px !important;
+        color: #64748b !important;
+        font-weight: 600 !important;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.2s ease !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: #ffffff !important;
+        color: #2563eb !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    /* Input text areas and file uploader */
+    .stTextArea textarea, .stFileUploader {
+        background: rgba(255, 255, 255, 0.85) !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        color: #0f172a !important;
+    }
+
+    /* =========================================================
+       HIGH-INTERACTION BUTTONS
+       ========================================================= */
+    /* Secondary/Glass Buttons */
+    div.stButton > button {
+        background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,244,255,0.8) 100%) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(99, 102, 241, 0.3) !important;
+        border-radius: 12px !important;
+        color: #1e1b4b !important;
+        font-weight: 700 !important;
+        padding: 0.75rem 1.5rem !important;
+        box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    div.stButton > button:hover {
+        transform: translateY(-2px) scale(1.01);
+        border-color: rgba(99, 102, 241, 0.6) !important;
+        box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.25) !important;
+        color: #4f46e5 !important;
+    }
+
+    /* Primary Action Button (Generate Plan) */
+    div.stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%) !important;
         color: #ffffff !important;
-        border-radius: 8px;
+        border: none !important;
+        box-shadow: 0 8px 25px -5px rgba(37, 99, 235, 0.4) !important;
+    }
+
+    div.stButton > button[kind="primary"]:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%) !important;
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 12px 30px -5px rgba(37, 99, 235, 0.6) !important;
+    }
+
+    /* Download Buttons */
+    div[data-testid="stDownloadButton"] > button {
+        background: rgba(16, 185, 129, 0.1) !important;
+        border: 1px solid rgba(16, 185, 129, 0.4) !important;
+        color: #047857 !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
+        transition: all 0.25s ease !important;
+    }
+
+    div[data-testid="stDownloadButton"] > button:hover {
+        background: #10b981 !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.3) !important;
     }
 </style>
 """, unsafe_allow_html=True)
