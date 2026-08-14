@@ -1,6 +1,6 @@
-streamlit
-google-genai
-pypdf
-python-docx
-reportlab
-graphviz
+streamlit>=1.40.0
+google-genai>=2.0.0
+pypdf>=4.2.0
+python-docx>=1.1.2
+reportlab>=4.2.0
+graphviz>=0.20.3
